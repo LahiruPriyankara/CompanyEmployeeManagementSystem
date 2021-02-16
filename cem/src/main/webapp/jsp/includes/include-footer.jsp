@@ -1,0 +1,1 @@
+<p style="text-align: center;">Sampath Bank PLC, 110 Sir James Peiris Mawatha, Colombo 02, Sri Lanka. All  Rights Reserved. Digital Employee Directory for Visitor Management v 1.0.0 @ 2021</p>
