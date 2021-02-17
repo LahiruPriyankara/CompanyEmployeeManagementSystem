@@ -5,12 +5,16 @@
     Created on : Dec 22, 2020, 11:08:45 AM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
 
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="com.company.models.FdUserModel"%>
 <%@page import="com.company.common.ApplicationConstants"%>
 <%@ include file="../includes/include-initial-variables.jsp"%>
 <%@ include file="../includes/include-notifications.jsp"%>  
+
 <style> 
     #detailsTable td {   
         padding-top: 5px;
@@ -22,9 +26,9 @@
     }
 </style>
 <%
-    CompanyUserModel DVMmodelMaster = objManager.get("DVMmodelMaster") != null ? (CompanyUserModel) objManager.get("DVMmodelMaster") : new CompanyUserModel();
-    CompanyUserModel DVMmodelTemp = objManager.get("DVMmodelTemp") != null ? (CompanyUserModel) objManager.get("DVMmodelTemp") : new CompanyUserModel();
-    CompanyUserModel UPMmodel = objManager.get("UPMmodel") != null ? (CompanyUserModel) objManager.get("UPMmodel") : new CompanyUserModel();
+    CompanyUserModel DVMmodelMaster = objManager.get("CEMmodelMaster") != null ? (CompanyUserModel) objManager.get("CEMmodelMaster") : new CompanyUserModel();
+    CompanyUserModel DVMmodelTemp = objManager.get("CEMmodelTemp") != null ? (CompanyUserModel) objManager.get("CEMmodelTemp") : new CompanyUserModel();
+    CompanyUserModel UPMmodel = objManager.get("COM_SERVICEmodel") != null ? (CompanyUserModel) objManager.get("COM_SERVICEmodel") : new CompanyUserModel();
 
     //System.out.println("DVMmodelMaster.getBase64Image() : "+DVMmodelMaster.getBase64Image());
     //System.out.println("DVMmodelMaster.getBase64Image() : "+DVMmodelMaster.getBase64Image()==null);
@@ -36,7 +40,7 @@
     <%if (APPUtills.isThisStringValid(DVMmodelMaster.getBase64Image())) {%>
     <img src="data:image/png;base64,<%=DVMmodelMaster.getBase64Image()%>" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
     <%} else {%>
-    <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
+    <img src="${images}/userDefault.jpg" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
     <%}%>
 </div>
 

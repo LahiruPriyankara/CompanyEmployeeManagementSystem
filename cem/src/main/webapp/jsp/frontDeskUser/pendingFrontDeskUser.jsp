@@ -3,6 +3,11 @@
     Created on : Dec 21, 2020, 3:35:15 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
+
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -21,7 +26,7 @@
 <div>
     <ul class="nav nav-tabs"> 
         <li>
-            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>'/FrontDeskUser/ExistingFrontDeskUsers)"><b><i>Existing</i></b></a>
+            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/FrontDeskUser/ExistingFrontDeskUsers')"><b><i>Existing</i></b></a>
         </li>
         <li class="active">
             <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/FrontDeskUser.PendingFrontDeskUsers')"><b><i>Pending</i></b></a>
@@ -57,9 +62,9 @@
                                 <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUserDetails')"></span>
 
                                 <%if (!APPUtills.isThisStringValid(model.getRecStatus())) {%>
-                                <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUserForPasswordVerification('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser.SaveNewFrontDeskUserPassword')"></span>
+                                <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUserForPasswordVerification('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/SaveNewFrontDeskUserPassword')"></span>
                                 <%} else if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING)) {%>
-                                <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyFdUserForPasswordVerification('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser.VerifyFrontDeskUserPassword')"></span>
+                                <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyFdUserForPasswordVerification('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/VerifyFrontDeskUserPassword')"></span>
                                 <%}%>
 
                             </td>
@@ -141,8 +146,8 @@
             "dom": '<lf<t>ip>',
             //"lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]]
         });
-        $(".titleLink").css('background', '#ff751a');
-        $("#fdUsr").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#fdUsr").css('background', '#006080');
     });
 
     function saveFdUser(id, uri) {//pending tab

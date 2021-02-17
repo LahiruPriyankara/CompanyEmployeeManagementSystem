@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import com.company.dao.EventLogFacadeLocal;
-import com.company.dao.SeqNumberGeneratorBeanLocal;
 import com.company.dto.EventLogTbl;
 
 @Service
@@ -22,9 +21,6 @@ public class EventLogger implements EventLoggerLocal{
 
     @Autowired
     private EventLogFacadeLocal eventLogFacade;
-
-    //@Autowired
-    //private SeqNumberGeneratorBeanLocal seqNumberGeneratorBean;
 
     @Override
     public void doLog(HttpServletRequest req, String pUserId, String pEvtType, String pEvtAction, String pEvtDesc, String pOldValue, String pNewValue, String pEvtStatus) {

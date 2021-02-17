@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.company.bl.CompanyUserLogicLocal;
+import com.company.bl.EventLoggerLocal;
 import com.company.common.APPUtills;
 import com.company.common.ApplicationConstants;
 import com.company.common.ObjectManager;
@@ -39,220 +40,14 @@ public class CompanyEmployeeMngController {
 	//private static final Log log = LogFactory.getLog(CompanyEmployeeMngController.class);
 	@Autowired
     private CompanyUserLogicLocal companyUserLogic;
-	private ObjectManager objManager;
 	
-	@RequestMapping(value = { "/CompanyDepEmployee/ExistingEmp" })
-	public ModelAndView getAllEmployeeList(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
-		//UserData uData;
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> cemActiveUsers = new HashMap();//to hold CEM Active User AS KEY => employeeID: VALUE => UserData Object.
-        Map<String, CompanyUserModel> cemInactiveUsers = new HashMap();//to hold CEM Inactive User AS KEY => employeeID: VALUE => UserData Object.
-        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap();//to hold CEM Users who are not match with UPM.
-        Map<String, CompanyUserModel> cemNotAvailableUsers = new HashMap();//to hold Users who are not in CEM(They are only in UPM).
-        Map<String, DivInfo> divInfoMap = new HashMap();//to store sol infomation
-        CompanyUserModel model = null;
-        String depCode = "";
-        Map<String, CompanyUserModel> cemUsersMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are match with UPM.For Authorize view.
-        ObjectManager objManager = null;
-        UserData userData;
-        try {
-            /*
-            /* 
-            --------------- MASTER DATA --------------
-            Getting CEM user for logged user DEP id – MAP- bankEmployeesMap
-            Getting COM_SERVICE user for logged user DEP id – MAP =>List-UPMEmployeesList
-            LOOP UPM ser:
-                    IF it is in DVM
-                        TRUE:
-                            check it and separate to dvmUsersMisMatchWithUPM,dvmActiveUsers,dvmInactiveUsers
-                        FALSE:
-                            IF it is in DVM with another SOL
-                                TRUE:
-                                    add to dvmUsersMisMatchWithUPM as MODIFY record
-                                FALSE:
-                                    add to dvmNotAvailableUsers as NEW record
-            END LOOP  
-             */
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
-        	
-        	
-        	objManager.remove("divInfoMap");
-            //objManager.remove("upmBankEmployeesMap");
-            objManager.remove("cemActiveUsers");
-            objManager.remove("cemInactiveUsers");
-            objManager.remove("cemNotAvailableUsers");
-            objManager.remove("companyEmployeesMap");
-            objManager.remove("cemUsersMisMatchWithCOM_SERVICE");
-            //objManager.remove("cemUsersMatchWithCOM_SERVICE");
-
-            
-            //depCode = userData.getSOL_ID();
-            depCode = userData.getDIV_CODE();
-            System.out.println("MESSAGE | SOL ID : " + depCode);
-            if (!APPUtills.isThisStringValid(depCode)) {
-                System.out.println("ERROR | Empty DIV ID recieved.You do not have permission to view this page.");
-                throw new SBLException("You do not have permission to view this page.");
-            }
-            
-            System.out.println("MESSAGE | MASTER DATA..");
-            if (true) {//Only for common Admin
-            	divInfoMap = companyUserLogic.getAllDepInfo();
-                objManager.put("divInfoMap", divInfoMap, ApplicationConstants.SCOPE_BANK_USER);
-            } 
-            
-            companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, null, depCode);
-            HashMap<String, UserData> UPMEmployeesMap = companyUserLogic.getCOM_SERVICEEmployeesMap(depCode, null);
-            List<UserData> UPMEmployeesList = new ArrayList<>(UPMEmployeesMap.values());
-            System.out.println("MESSAGE | UPMEmployeesList.size() : " + UPMEmployeesList.size());
-            for (UserData uData : UPMEmployeesList) {
-
-                model = CompanyUserModel.userDataToModel(uData);
-                model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
-                COM_SERVICEEmployeesMap.put(uData.getAD_USER_ID(), model);
-
-                if (companyEmployeesMap.get(uData.getAD_USER_ID()) != null) {//That user is available in DVM
-                    //System.out.println("MESSAGE | That user is available in DVM");
-                    model = companyEmployeesMap.get(uData.getAD_USER_ID());
-                    model.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
-
-                    if (!model.getCompanyUserFirstName().equalsIgnoreCase(uData.getFIRST_NAME()) || !model.getCompanyUserLastName().equalsIgnoreCase(uData.getLAST_NAME()) || !model.getCompanyUserDepName().equalsIgnoreCase(uData.getDIV_NAME())) {
-                    	cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), model);//dvmUsersMisMatchWithUPM.put(uData.getAD_USER_ID(), CompanyUserModel.userDataToModel(uData));
-                    } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_ACTIVE)) {
-                    	cemActiveUsers.put(uData.getAD_USER_ID(), model);
-                    } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE)) {
-                    	cemInactiveUsers.put(uData.getAD_USER_ID(), model);
-                    }
-                } else {
-                    //System.out.println("MESSAGE | That user is not available in DVM");
-                    model = CompanyUserModel.userDataToModel(uData);
-
-                    Map<String, CompanyUserModel> bEMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(uData.getAD_USER_ID()), null);
-                    List<CompanyUserModel> bEObjList = new ArrayList<>(bEMap.values());
-                    if (bEObjList.size() > 0) {
-                        CompanyUserModel dvmMsterModel = (CompanyUserModel) bEObjList.get(0);
-                        cemUsersMisMatchWithCOM_SERVICE.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
-                        companyEmployeesMap.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
-                    } else {
-                        model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
-                        cemNotAvailableUsers.put(uData.getAD_USER_ID(), model);
-                    }
-
-                }
-            }
-            objManager.put("COM_SERVICEEmployeesMap", COM_SERVICEEmployeesMap, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemActiveUsers", cemActiveUsers, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemInactiveUsers", cemInactiveUsers, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemNotAvailableUsers", cemNotAvailableUsers, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("companyEmployeesMap", companyEmployeesMap, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemUsersMisMatchWithCOM_SERVICE", cemUsersMisMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_BANK_USER);
-            //objManager.put("cemUsersMatchWithCOM_SERVICE", cemUsersMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_BANK_USER);
-            
-            System.out.println("MESSAGE | COM_SERVICEEmployeesMap.size() : " + COM_SERVICEEmployeesMap.size() + " cemActiveUsers.size() : " + cemActiveUsers.size() + " cemInactiveUsers.size() : " + cemInactiveUsers.size() + " cemNotAvailableUsers.size() : " + cemNotAvailableUsers.size());            
-            System.out.println("MESSAGE | bankEmployeesMap.size() : " + companyEmployeesMap.size() + " cemUsersMisMatchWithCOM_SERVICE.size() : " + cemUsersMisMatchWithCOM_SERVICE.size() + " cemUsersMatchWithCOM_SERVICE.size() : " + cemUsersMatchWithCOM_SERVICE.size());
-        
-        	
-        	
-        } catch (SBLException ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            return new ModelAndView("employee/existingEmp");
-        } catch (Exception ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            return new ModelAndView("employee/existingEmp");
-        }
-
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
-        return new ModelAndView("employee/existingEmp");
-		
-	}
+	@Autowired
+    private EventLoggerLocal eventLogger;
 	
-	@RequestMapping(value = { "/CompanyEmployee/PendingEmp" })
-	public ModelAndView getEmployeeDetailsForCommonView(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
-		System.out.println("ENTERED | CompanyEmployeeCommonViewController.getEmployeeDetailsForCommonView()");
-		//UserData uData;
-        Map<String, HashMap> upmEmployeeMap = new HashMap();
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are not match with UPM.
-        String depCode = "";
-        Map<String, CompanyUserModel> cemUsersMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are match with UPM.For Authorize view.
-        ObjectManager objManager = null;
-        UserData userData;
-        try {
-            /*
-           ---------------- TEMP DATA ---------------
-            Getting DVM bank user for logged user SOL id – MAP- bankEmployeesMap.If SOL id is not given, All temp pending and rejected record will be fetch(This is for common eneterer and authorizer)
-            Getting UPM bank user for logged user SOL id – MAP =>List-UPMEmployeesList
-            upmEmployeeMap - to hold all the upm emloyee as MAP(sol id,employee map)
-            LOOP DVM user:
-                    IF sol id is in upmEmployeeMap
-                        FALSE:
-                            take employee from upm for that sol id and put it to  upmEmployeeMap
-
-                        UPMEmployeesMap(empId,Employee) = take upm map for that sol id from upmEmployeeMap
-                        IF DVM user is available or not in UPMEmployeesMap - by passing empId
-                            TRUE:
-                                add to dvmUsersMatchWithUPM - can be verified or rejected or deleted
-                            FALSE:
-                                add to dvmUsersMisMatchWithUPM - can be deleted only
-            END LOOP            
-             */
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
-        	
-        	
-            //objManager.remove("upmBankEmployeesMap");
-            objManager.remove("companyEmployeesMap");            
-            objManager.remove("cemUsersMisMatchWithCOM_SERVICE");
-            objManager.remove("cemUsersMatchWithCOM_SERVICE");
-
-            //depCode = userData.getSOL_ID();
-            depCode = userData.getDIV_CODE();
-            System.out.println("MESSAGE | SOL ID : " + depCode);
-            if (!APPUtills.isThisStringValid(depCode)) {
-                System.out.println("ERROR | Empty DIV ID recieved.You do not have permission to view this page.");
-                throw new SBLException("You do not have permission to view this page.");
-            }
-            
-            System.out.println("MESSAGE | TEMP DATA..");
-            //depCode = "861";// if common enter - depCode = ""
-            companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.TEMP_DATA, null, depCode);
-            List<CompanyUserModel> bankEmployeesList = new ArrayList<>(companyEmployeesMap.values());//DVM Temp Employee list
-            System.out.println("MESSAGE | bankEmployeesList.size() : " + bankEmployeesList.size());
-            for (CompanyUserModel bankUserModel : bankEmployeesList) {
-                if (upmEmployeeMap.get(bankUserModel.getCompanyUserDivId()) == null) {
-                    upmEmployeeMap.put(bankUserModel.getCompanyUserDivId(), companyUserLogic.getCOM_SERVICEEmployeesMap(bankUserModel.getCompanyUserDivId(), null));
-                }
-                Map<String, UserData> UPMEmployeesMap = upmEmployeeMap.get(bankUserModel.getCompanyUserDivId());
-                if (UPMEmployeesMap.get(bankUserModel.getCompanyUserEmpId()) != null) {
-                	cemUsersMatchWithCOM_SERVICE.put(bankUserModel.getCompanyUserEmpId(), bankUserModel);
-                } else {
-                	cemUsersMisMatchWithCOM_SERVICE.put(bankUserModel.getCompanyUserEmpId(), bankUserModel);
-                    //bankEmployeesMap.remove(bankUserModel.getBankUserEmpId());
-                }
-
-            }
-            System.out.println("MESSAGE | cemUsersMatchWithCOM_SERVICE.size() : " + cemUsersMatchWithCOM_SERVICE.size() + " cemUsersMisMatchWithCOM_SERVICE.size() : " + cemUsersMisMatchWithCOM_SERVICE.size());
-     
-            objManager.put("companyEmployeesMap", companyEmployeesMap, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemUsersMisMatchWithCOM_SERVICE", cemUsersMisMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemUsersMatchWithCOM_SERVICE", cemUsersMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_BANK_USER);
-
-            
-        } catch (SBLException ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
-        } catch (Exception ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
-        }
-
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getEmployeeDetailsForCommonView()");
-        return new ModelAndView("employee/existingEmp");
-	}
-		
+	
 	@RequestMapping(value = { "/CompanyEmployee/SearchEmp"})
-	public ModelAndView getSearchBankEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+	public ModelAndView getSearchBankEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+		System.out.println("LEFT    | CompanyEmployeeCommonViewController.getSearchBankEmp()");
 		//UserData uData;
         Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
         Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
@@ -268,7 +63,7 @@ public class CompanyEmployeeMngController {
         UserData userData;
         try {
             /*
-           Getting CEM user for logged user DEP id – MAP- bankEmployeesMap
+           Getting CEM user for logged user DEP id – MAP- companyEmployeesMap
             IF depCode NULL AND empId NOT NULL
                 Special case to fetch data from a data base link
                 add data to UPMEmployeesMap
@@ -277,17 +72,23 @@ public class CompanyEmployeeMngController {
             LOOP UPM users:
                     IF it is in CEM
                         TRUE:
-                            check it and separate to dvmUsersMisMatchWithUPM,dvmActiveUsers,dvmInactiveUsers
+                            check it and separate to cemUsersMisMatchWithCOM_SERVICE,cemActiveUsers,cemInactiveUsers
                         FALSE:
                             IF it is in DVM with another SOL
                                 TRUE:
-                                    add to dvmUsersMisMatchWithUPM as MODIFY record
+                                    add to cemUsersMisMatchWithCOM_SERVICE as MODIFY record
                                 FALSE:
-                                    add to dvmNotAvailableUsers as NEW record
+                                    add to cemNotAvailableUsers as NEW record
             END LOOP 
              */
         	objManager = new ObjectManager(session);
         	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
         	
             objManager.remove("COM_SERVICEEmployeesMap");
             objManager.remove("cemActiveUsers");
@@ -311,7 +112,7 @@ public class CompanyEmployeeMngController {
             String criteria = divInfoMap.get(depCode) != null ? ((DivInfo) divInfoMap.get(depCode)).getName() : "";
             criteria = "DEPARTMENT :" + criteria + "  |  EMPLOYEE ID :" + empId;
             System.out.println("MESSAGE | criteria : " + criteria);
-            objManager.put("criteria", criteria, ApplicationConstants.SCOPE_BANK_USER);
+            objManager.put("criteria", criteria, ApplicationConstants.SCOPE_COMPANY_USER);
             //.....................
 
             companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, empId.equalsIgnoreCase("") ? null : Arrays.asList(empId), depCode);
@@ -335,7 +136,7 @@ public class CompanyEmployeeMngController {
                     model.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
 
                     if (!model.getCompanyUserFirstName().equalsIgnoreCase(uData.getFIRST_NAME()) || !model.getCompanyUserLastName().equalsIgnoreCase(uData.getLAST_NAME()) || !model.getCompanyUserDepName().equalsIgnoreCase(uData.getDIV_NAME())) {
-                    	cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), model);//dvmUsersMisMatchWithUPM.put(uData.getAD_USER_ID(), CompanyUserModel.userDataToModel(uData));
+                    	cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), model);//cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), CompanyUserModel.userDataToModel(uData));
                     } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_ACTIVE)) {
                         cemActiveUsers.put(uData.getAD_USER_ID(), model);
                     } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE)) {
@@ -358,45 +159,263 @@ public class CompanyEmployeeMngController {
                 }
             }
 
-            objManager.put("COM_SERVICEEmployeesMap", COM_SERVICEEmployeesMap, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemActiveUsers", cemActiveUsers, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemInactiveUsers", cemInactiveUsers, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemUsersMisMatchWithCOM_SERVICE", cemUsersMisMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("cemNotAvailableUsers", cemNotAvailableUsers, ApplicationConstants.SCOPE_BANK_USER);
+            objManager.put("COM_SERVICEEmployeesMap", COM_SERVICEEmployeesMap, ApplicationConstants.SCOPE_COMPANY_USER);
+            objManager.put("cemActiveUsers", cemActiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+            objManager.put("cemInactiveUsers", cemInactiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+            objManager.put("cemUsersMisMatchWithCOM_SERVICE", cemUsersMisMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_COMPANY_USER);
+            objManager.put("cemNotAvailableUsers", cemNotAvailableUsers, ApplicationConstants.SCOPE_COMPANY_USER);
         	
         	
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             //return new ModelAndView("employee/existingEmp");
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             //return new ModelAndView("employee/existingEmp");
         }
 
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getSearchBankEmp()");
         return new ModelAndView("employee/existingEmp");
 		
 	}
+	
+	@RequestMapping(value = { "/CompanyDepEmployee/ExistingEmp" })
+	public ModelAndView getAllEmployeeList(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+		System.out.println("ENTER    | CompanyEmployeeCommonViewController.ExistingEmp()");
+		ObjectManager objManager = null;
+        UserData userData;
+        try {
+            
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	getEmployeeListFromCem(objManager, ApplicationConstants.MASTER_DATA, userData);
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("includes/include-dashboard");
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("includes/include-dashboard");
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.ExistingEmp()");
+        return new ModelAndView("employee/existingEmp");
 		
-	@RequestMapping(value = { "/CompanyEmployee/ExistingEmpDetails"})
-	public ModelAndView ExistingEmpDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
-		System.out.println("ENTERED | CompanyEmployeeMngController.getEmployeeDetails()");
-		CompanyUserModel CEMmodelMaster;
-        //CompanyUserModel CEMmodelTemp;
-        CompanyUserModel COM_SERVICEmodel;
+	}
+	
+	@RequestMapping(value = { "/CompanyEmployee/PendingEmp" })
+	public ModelAndView pendingEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+		System.out.println("ENTERED | CompanyEmployeeCommonViewController.pendingEmp()");
+		ObjectManager objManager = null;
+        UserData userData;
+        try {           
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	getEmployeeListFromCem(objManager, ApplicationConstants.TEMP_DATA, userData);
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("employee/existingEmp");
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("employee/existingEmp");
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.pendingEmp()");
+        return new ModelAndView("employee/pendingEmp");
+	}
+	
+	private void getEmployeeListFromCem(ObjectManager objManager, String type, UserData userData) throws SBLException { // For Admin View | both existing and pending
+        System.out.println("ENTERED | CompanyEmployeeMngController.getEmployeeListFromCem()");
+        //UserData uData;
+        Map<String, HashMap> upmEmployeeMap = new HashMap();
         Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
         Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
+        Map<String, CompanyUserModel> cemActiveUsers = new HashMap();//to hold DVM Active User AS KEY => employeeID: VALUE => UserData Object.
+        Map<String, CompanyUserModel> cemInactiveUsers = new HashMap();//to hold DVM Inactive User AS KEY => employeeID: VALUE => UserData Object.
+        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are not match with UPM.
+        Map<String, CompanyUserModel> cemNotAvailableUsers = new HashMap();//to hold Users who are not in DVM(They are only in UPM).
+        Map<String, DivInfo> divInfoMap = new HashMap();//to store sol infomation
+        CompanyUserModel model = null;
+        String depCode = "";
+        Map<String, CompanyUserModel> cemUsersMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are match with UPM.For Authorize view.
+        try {
+            /* 
+            --------------- MASTER DATA --------------
+            Getting DVM bank user for logged user SOL id – MAP- companyEmployeesMap
+            Getting UPM bank user for logged user SOL id – MAP =>List-UPMEmployeesList
+            LOOP UPM ser:
+                    IF it is in DVM
+                        TRUE:
+                            check it and separate to cemUsersMisMatchWithCOM_SERVICE,cemActiveUsers,cemInactiveUsers
+                        FALSE:
+                            IF it is in DVM with another SOL
+                                TRUE:
+                                    add to cemUsersMisMatchWithCOM_SERVICE as MODIFY record
+                                FALSE:
+                                    add to cemNotAvailableUsers as NEW record
+            END LOOP            
+
+            ---------------- TEMP DATA ---------------
+            Getting DVM bank user for logged user SOL id – MAP- companyEmployeesMap.If SOL id is not given, All temp pending and rejected record will be fetch(This is for common eneterer and authorizer)
+            Getting UPM bank user for logged user SOL id – MAP =>List-UPMEmployeesList
+            upmEmployeeMap - to hold all the upm emloyee as MAP(sol id,employee map)
+            LOOP DVM user:
+                    IF sol id is in upmEmployeeMap
+                        FALSE:
+                            take employee from upm for that sol id and put it to  upmEmployeeMap
+
+                        UPMEmployeesMap(empId,Employee) = take upm map for that sol id from upmEmployeeMap
+                        IF DVM user is available or not in UPMEmployeesMap - by passing empId
+                            TRUE:
+                                add to cemUsersMatchWithCOM_SERVICE - can be verified or rejected or deleted
+                            FALSE:
+                                add to cemUsersMisMatchWithCOM_SERVICE - can be deleted only
+            END LOOP            
+             */
+
+            objManager.remove("divInfoMap");
+            //objManager.remove("COM_SERVICEEmployeesMap");
+            objManager.remove("cemActiveUsers");
+            objManager.remove("cemInactiveUsers");
+            objManager.remove("cemNotAvailableUsers");
+            objManager.remove("companyEmployeesMap");
+            objManager.remove("cemUsersMisMatchWithCOM_SERVICE");
+            objManager.remove("cemUsersMatchWithCOM_SERVICE");
+
+            //depCode = userData.getSOL_ID();
+            depCode = userData.getDIV_CODE();
+            System.out.println("MESSAGE | SOL ID : " + depCode);
+            if (!APPUtills.isThisStringValid(depCode)) {
+                System.out.println("ERROR | Empty DIV ID recieved.You do not have permission to view this page.");
+                throw new SBLException("You do not have permission to view this page.");
+            }
+
+            if (type.equalsIgnoreCase(ApplicationConstants.MASTER_DATA)) {
+                System.out.println("MESSAGE | MASTER DATA..");
+                if (true) {//Only for common Admin
+                    divInfoMap = companyUserLogic.getAllDepInfo();
+                    objManager.put("divInfoMap", divInfoMap, ApplicationConstants.SCOPE_COMPANY_USER);
+                }
+
+                //depCode = "861";
+                companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, null, depCode);
+                HashMap<String, UserData> UPMEmployeesMap = companyUserLogic.getCOM_SERVICEEmployeesMap(depCode, null);
+                List<UserData> UPMEmployeesList = new ArrayList<>(UPMEmployeesMap.values());
+                System.out.println("MESSAGE | UPMEmployeesList.size() : " + UPMEmployeesList.size());
+                for (UserData uData : UPMEmployeesList) {
+
+                    model = CompanyUserModel.userDataToModel(uData);
+                    model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
+                    COM_SERVICEEmployeesMap.put(uData.getAD_USER_ID(), model);
+
+                    if (companyEmployeesMap.get(uData.getAD_USER_ID()) != null) {//That user is available in DVM
+                        //System.out.println("MESSAGE | That user is available in DVM");
+                        model = companyEmployeesMap.get(uData.getAD_USER_ID());
+                        model.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
+
+                        if (!model.getCompanyUserFirstName().equalsIgnoreCase(uData.getFIRST_NAME()) || !model.getCompanyUserLastName().equalsIgnoreCase(uData.getLAST_NAME()) || !model.getCompanyUserDepName().equalsIgnoreCase(uData.getDIV_NAME())) {
+                            cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), model);//cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), CompanyUserModel.userDataToModel(uData));
+                        } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_ACTIVE)) {
+                            cemActiveUsers.put(uData.getAD_USER_ID(), model);
+                        } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE)) {
+                            cemInactiveUsers.put(uData.getAD_USER_ID(), model);
+                        }
+                    } else {
+                        //System.out.println("MESSAGE | That user is not available in DVM");
+                        model = CompanyUserModel.userDataToModel(uData);
+
+                        Map<String, CompanyUserModel> bEMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(uData.getAD_USER_ID()), null);
+                        List<CompanyUserModel> bEObjList = new ArrayList<>(bEMap.values());
+                        if (bEObjList.size() > 0) {
+                            CompanyUserModel dvmMsterModel = (CompanyUserModel) bEObjList.get(0);
+                            cemUsersMisMatchWithCOM_SERVICE.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
+                            companyEmployeesMap.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
+                        } else {
+                            model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
+                            cemNotAvailableUsers.put(uData.getAD_USER_ID(), model);
+                        }
+
+                    }
+                }
+                objManager.put("COM_SERVICEEmployeesMap", COM_SERVICEEmployeesMap, ApplicationConstants.SCOPE_COMPANY_USER);
+                objManager.put("cemActiveUsers", cemActiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+                objManager.put("cemInactiveUsers", cemInactiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+                objManager.put("cemNotAvailableUsers", cemNotAvailableUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+
+                System.out.println("MESSAGE | COM_SERVICEEmployeesMap.size() : " + COM_SERVICEEmployeesMap.size() + " cemActiveUsers.size() : " + cemActiveUsers.size() + " cemInactiveUsers.size() : " + cemInactiveUsers.size() + " cemNotAvailableUsers.size() : " + cemNotAvailableUsers.size());
+
+            } else if (type.equalsIgnoreCase(ApplicationConstants.TEMP_DATA)) {
+                System.out.println("MESSAGE | TEMP DATA..");
+                //depCode = "861";// if common enter - depCode = ""
+                companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.TEMP_DATA, null, depCode);
+                List<CompanyUserModel> bankEmployeesList = new ArrayList<>(companyEmployeesMap.values());//DVM Temp Employee list
+                System.out.println("MESSAGE | bankEmployeesList.size() : " + bankEmployeesList.size());
+                for (CompanyUserModel bankUserModel : bankEmployeesList) {
+                    if (upmEmployeeMap.get(bankUserModel.getCompanyUserDivId()) == null) {
+                        upmEmployeeMap.put(bankUserModel.getCompanyUserDivId(),  companyUserLogic.getCOM_SERVICEEmployeesMap(bankUserModel.getCompanyUserDivId(), null));
+                    }
+                    Map<String, UserData> UPMEmployeesMap = upmEmployeeMap.get(bankUserModel.getCompanyUserDivId());
+                    if (UPMEmployeesMap.get(bankUserModel.getCompanyUserEmpId()) != null) {
+                        cemUsersMatchWithCOM_SERVICE.put(bankUserModel.getCompanyUserEmpId(), bankUserModel);
+                    } else {
+                        cemUsersMisMatchWithCOM_SERVICE.put(bankUserModel.getCompanyUserEmpId(), bankUserModel);
+                        //companyEmployeesMap.remove(bankUserModel.getCompanyUserEmpId());
+                    }
+
+                }
+                System.out.println("MESSAGE | cemUsersMatchWithCOM_SERVICE.size() : " + cemUsersMatchWithCOM_SERVICE.size() + " cemUsersMisMatchWithCOM_SERVICE.size() : " + cemUsersMisMatchWithCOM_SERVICE.size());
+            }
+            objManager.put("companyEmployeesMap", companyEmployeesMap, ApplicationConstants.SCOPE_COMPANY_USER);
+            objManager.put("cemUsersMisMatchWithCOM_SERVICE", cemUsersMisMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_COMPANY_USER);
+            objManager.put("cemUsersMatchWithCOM_SERVICE", cemUsersMatchWithCOM_SERVICE, ApplicationConstants.SCOPE_COMPANY_USER);
+
+            System.out.println("MESSAGE | companyEmployeesMap.size() : " + companyEmployeesMap.size() + " cemUsersMisMatchWithCOM_SERVICE.size() : " + cemUsersMisMatchWithCOM_SERVICE.size() + " cemUsersMatchWithCOM_SERVICE.size() : " + cemUsersMatchWithCOM_SERVICE.size());
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            throw new SBLException(ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            throw new SBLException("Unable to get employee list");
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeMngController.getEmployeeListFromCem()");
+    }
+	
+	//-------------------------------------------------------------------------------------------------------------------------------------
+	
+		
+	@RequestMapping(value = { "/CompanyEmployee/ExistingEmpDetails"})
+	public ModelAndView existingEmpDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+		System.out.println("ENTERED | CompanyEmployeeMngController.existingEmpDetails()");
         ObjectManager objManager = null;
         UserData userData;
         try {
-        	 /*
-            //------------ MASTER ------------ 
-            fetching DVM master from objManager - DVMmodelMaster
-            fetching UPM from objManager - UPMmodel
-             */
         	objManager = new ObjectManager(session);
         	userData = (UserData) objManager.get("userData");
 
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	
             objManager.remove("CEMmodelMaster");
             //objManager.remove("CEMmodelTemp");
             objManager.remove("COM_SERVICEmodel");
@@ -408,280 +427,568 @@ public class CompanyEmployeeMngController {
                 throw new SBLException("Id is not recived.");
             }
             
-            companyEmployeesMap = objManager.get("bankEmployeesMap") != null ? (HashMap) objManager.get("bankEmployeesMap") : new HashMap();
-        	COM_SERVICEEmployeesMap = objManager.get("upmBankEmployeesMap") != null ? (HashMap) objManager.get("upmBankEmployeesMap") : new HashMap();
+            getEmployeeDetails(objManager, ApplicationConstants.MASTER_DATA, req);
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("employee/existingEmp");
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("employee/existingEmp");
+        }
 
-        	CEMmodelMaster = companyEmployeesMap.get(empId);
-        	COM_SERVICEmodel = COM_SERVICEEmployeesMap.get(empId);
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.existingEmpDetails()");
+        return new ModelAndView("employee/existingEmpDetails");
+		
+	}	
+	
+	@RequestMapping(value = { "/CompanyEmployee/PendingEmpDetails"})
+	public ModelAndView pendingEmpDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+		System.out.println("ENTERED | CompanyEmployeeMngController.pendingEmpDetails()");
+        ObjectManager objManager = null;
+        UserData userData;
+        try {
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
 
-            if (CEMmodelMaster == null && COM_SERVICEmodel != null) {
-            	CEMmodelMaster = COM_SERVICEmodel;
-            } else if (CEMmodelMaster == null && COM_SERVICEmodel == null) {
-                System.out.println("ERROR | Can not found a object for " + empId);
-                throw new SBLException("Can not found a object.");
-            }
-
-            System.out.println("MESSAGE | Successfully found objects.");
-            objManager.put("CEMmodelMaster", CEMmodelMaster, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("UPMmodel", COM_SERVICEmodel, ApplicationConstants.SCOPE_BANK_USER);
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	
+        	getEmployeeDetails(objManager, ApplicationConstants.TEMP_DATA, req);
+        	
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             //return new ModelAndView("employee/existingEmp");
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             //return new ModelAndView("employee/existingEmp");
         }
 
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
-        return new ModelAndView("employee/existingEmp");
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.pendingEmpDetails()");
+        return new ModelAndView("employee/pendingEmpDetails");
 		
-	}	
+	}
 	
-	@RequestMapping(value = { "/CompanyEmployee/PendingEmpDetails"})
-	public ModelAndView PendingEmpDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
-		System.out.println("ENTERED | CompanyEmployeeMngController.getEmployeeDetails()");
-		CompanyUserModel CEMmodelMaster;
+	private void getEmployeeDetails(ObjectManager objManager, String type, HttpServletRequest req) throws SBLException {// For Admin View | both existing and pending Details
+        System.out.println("ENTERED | CompanyEmployeeMngController.getEmployeeDetails()");
+        CompanyUserModel CEMmodelMaster;
         CompanyUserModel CEMmodelTemp;
         CompanyUserModel COM_SERVICEmodel;
         Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
         Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
-        ObjectManager objManager = null;
-        UserData userData;
         try {
-        	 /*
+            /*
+            //------------ MASTER ------------ 
+            fetching CEM master from objManager - CEMmodelMaster
+            fetching COM_SERVICE from objManager - COM_SERVICEmodel
+            
             //------------ TEMP ------------ 
-            fetching DVM temp from objManager - DVMmodelTemp
-            fetching DVM master from Database(by giving empId and solId, take it from temp object - DVMmodelTemp)
-            fetching UPM from objManager - UPMmodel
+            fetching CEM temp from objManager - CEMmodelTemp
+            fetching CEM master from Database(by giving empId and solId, take it from temp object - CEMmodelMaster)
+            fetching COM_SERVICE from objManager - COM_SERVICEmodel
              */
-        	
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
 
             objManager.remove("CEMmodelMaster");
             objManager.remove("CEMmodelTemp");
             objManager.remove("COM_SERVICEmodel");
 
             String empId = req.getParameter("id");
-            System.out.println("MESSAGE | Employee ID : " + empId);
+            System.out.println("MESSAGE | Employee ID : " + empId + ", Type : " + type);
             if (!APPUtills.isThisStringValid(empId)) {
                 System.out.println("ERROR   | Id is not recived.");
                 throw new SBLException("Id is not recived.");
             }
-            
-            System.out.println("MESSAGE | Going to fetch from DVM temp.");
-            companyEmployeesMap = objManager.get("bankEmployeesMap") != null ? (HashMap) objManager.get("bankEmployeesMap") : new HashMap();
-            CEMmodelTemp = companyEmployeesMap.get(empId);
+            if (type.equalsIgnoreCase(ApplicationConstants.MASTER_DATA)) {
+                companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+                COM_SERVICEEmployeesMap = objManager.get("COM_SERVICEEmployeesMap") != null ? (HashMap) objManager.get("COM_SERVICEEmployeesMap") : new HashMap();
 
-            if (CEMmodelTemp == null) {
-                System.out.println("ERROR | Can not found a object for " + empId);
-                throw new SBLException("Can not found a object.");
+                CEMmodelMaster = companyEmployeesMap.get(empId);
+                COM_SERVICEmodel = COM_SERVICEEmployeesMap.get(empId);
+
+                if (CEMmodelMaster == null && COM_SERVICEmodel != null) {
+                    CEMmodelMaster = COM_SERVICEmodel;
+                } else if (CEMmodelMaster == null && COM_SERVICEmodel == null) {
+                    System.out.println("ERROR | Can not found a object for " + empId);
+                    throw new SBLException("Can not found a object.");
+                }
+
+                System.out.println("MESSAGE | Successfully found objects.");
+                objManager.put("CEMmodelMaster", CEMmodelMaster, ApplicationConstants.SCOPE_COMPANY_USER);
+                objManager.put("COM_SERVICEmodel", COM_SERVICEmodel, ApplicationConstants.SCOPE_COMPANY_USER);
+
+            } else if (type.equalsIgnoreCase(ApplicationConstants.TEMP_DATA)) {
+
+                System.out.println("MESSAGE | Going to fetch from DVM temp.");
+                companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+                CEMmodelTemp = companyEmployeesMap.get(empId);
+
+                if (CEMmodelTemp == null) {
+                    System.out.println("ERROR | Can not found a object for " + empId);
+                    throw new SBLException("Can not found a object.");
+                }
+
+                System.out.println("MESSAGE | Going to fetch from DVM master.");
+                Map<String, CompanyUserModel> dfumsMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(empId), null);//String tableType, List<String> ids, String depCode               
+                CEMmodelMaster = dfumsMap.get(empId);
+
+                System.out.println("MESSAGE | Going to fetch from UPM.");
+                COM_SERVICEEmployeesMap = objManager.get("COM_SERVICEEmployeesMap") != null ? (HashMap) objManager.get("COM_SERVICEEmployeesMap") : new HashMap();
+                COM_SERVICEmodel = COM_SERVICEEmployeesMap.get(empId);
+
+                System.out.println("MESSAGE | Successfully found objects.");
+
+                objManager.put("CEMmodelMaster", CEMmodelMaster, ApplicationConstants.SCOPE_COMPANY_USER);
+                objManager.put("CEMmodelTemp", CEMmodelTemp, ApplicationConstants.SCOPE_COMPANY_USER);
+                objManager.put("COM_SERVICEmodel", COM_SERVICEmodel, ApplicationConstants.SCOPE_COMPANY_USER);
             }
 
-            System.out.println("MESSAGE | Going to fetch from DVM master.");
-            Map<String, CompanyUserModel> dfumsMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(empId), null);//String tableType, List<String> ids, String depCode               
-            CEMmodelMaster = dfumsMap.get(empId);
-
-            System.out.println("MESSAGE | Going to fetch from UPM.");
-            COM_SERVICEEmployeesMap = objManager.get("upmBankEmployeesMap") != null ? (HashMap) objManager.get("upmBankEmployeesMap") : new HashMap();
-            COM_SERVICEmodel = COM_SERVICEEmployeesMap.get(empId);
-
-            System.out.println("MESSAGE | Successfully found objects.");
-
-            objManager.put("CEMmodelMaster", CEMmodelMaster, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("CEMmodelTemp", CEMmodelTemp, ApplicationConstants.SCOPE_BANK_USER);
-            objManager.put("COM_SERVICEmodel", COM_SERVICEmodel, ApplicationConstants.SCOPE_BANK_USER);
         } catch (SBLException ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
+            throw new SBLException(ex.getMessage());
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
+            throw new SBLException("Unable to get employee details");
         }
 
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
-        return new ModelAndView("employee/existingEmp");
-		
-	}
-		
-	@RequestMapping(value = { "CompanyEmployee/SaveCompanyEmp"})
-	public ModelAndView SaveCompanyEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
-		System.out.println("ENTERED | CompanyEmployeeMngController.saveEmployeeDetails()");
-        CompanyUserModel model;
-        List<CompanyUserModel> bankUserModels = new ArrayList();
-        boolean isSuccess = false;
-        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
-        List<String> IdsAryList = new ArrayList<>();
+        System.out.println("LEFT    | CompanyEmployeeMngController.getEmployeeDetails()");
+    }
+	
+//-------------------------------------------------------------------------------------------------------------------------------------	
+	
+	@RequestMapping(value = { "CompanyEmployee/SaveSingleEmp"})
+	public String saveSingleEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+		System.out.println("ENTERED | CompanyEmployeeMngController.saveSingleEmp()");
         ObjectManager objManager = null;
         UserData userData;
         try {
-        	
-        	 /*
-            take object from objManager and add to bankUserModels List to save
-            Update event log
-             */
-        	
         	objManager = new ObjectManager(session);
         	userData = (UserData) objManager.get("userData");
         	
-        	model = objManager.get("CEMmodelMaster") != null ? (CompanyUserModel) objManager.get("CEMmodelMaster") : new CompanyUserModel();
-
-            if (model == null) {
-                System.out.println("ERROR | Can not find a object..");
-                throw new SBLException("Can not find a object." + ApplicationConstants.ERR_MSG_SESSION_TERMINTATED);
-            }
-
-            String employeeId = model.getCompanyUserEmpId();
-            System.out.println("MESSAGE | employeeId :" + employeeId + ".");
-            if (validateFieldsFillData(model.getCompanyUserEmpId(), false, req)) {
-                model = fillObject(model, false, req);
-                System.out.println("MESSAGE | (NotBulk) model.toString() : " + model.toString());
-                bankUserModels.add(model);
-            }
-            if (bankUserModels.size() <= 0) {
-                throw new SBLException("No reviced objects to save.");
-            }
-            isSuccess = companyUserLogic.saveCompanyUser(bankUserModels, IdsAryList, userData);
-/*
-            if (isSuccess) {
-
-                for (CompanyUserModel userModel : bankUserModels) {
-                    eventAction = ApplicationConstants.actionTypeDesc(userModel.getActionType());
-                    eventDesc = "Bank user temp Id : " + userModel.getBankUserTmpId() + ", Save - ";
-                    masterObjectToString = "";
-                    tempObjectToString = ((DvmBankUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
-                    // Write to event log table.
-                    EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
-                }
-                req.setAttribute("rtnMsg", "Successfully Save.");
-            }
-*/
-            //eventAction = "";
-            //eventDesc = "Save bank user in temp table.";
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", "", "", ApplicationConstants.EVENTSUCCESSFUL);
-            req.setAttribute("rtnMsg", "Successfully save.");
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		throw new Exception(result);
+        	}
+        	saveEmployeeDetails(objManager, userData, false, req);
             
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             //return new ModelAndView("employee/existingEmp");
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             //return new ModelAndView("employee/existingEmp");
         }
 
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
-        return new ModelAndView("employee/existingEmp");
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.saveSingleEmp()");
+        //return new ModelAndView("employee/existingEmp");
+        return "redirect:/employee/existingEmp";
 		
 	}
 	
 	@RequestMapping(value = { "/CompanyEmployee/SaveBulkEmp"})
-	public ModelAndView SaveBulkEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
-		System.out.println("ENTERED | CompanyEmployeeMngController.saveEmployeeDetails()");
+	public String saveBulkEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+		System.out.println("ENTERED | CompanyEmployeeMngController.saveBulkEmp()");
+        ObjectManager objManager = null;
+        UserData userData;
+        try {        	
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		throw new Exception(result);
+        	}
+        	saveEmployeeDetails(objManager, userData, true, req);
+            
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("employee/existingEmp");
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("employee/existingEmp");
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.saveBulkEmp()");
+        //return new ModelAndView("employee/existingEmp");
+        return "redirect:/employee/existingEmp";
+		
+	}	
+		
+	private void saveEmployeeDetails(ObjectManager objManager, UserData userData, boolean isBulk, HttpServletRequest req) throws SBLException {
+       System.out.println("ENTERED | BankEmployeeMngAction.saveEmployeeDetails()");
         CompanyUserModel model;
-        List<CompanyUserModel> bankUserModels = new ArrayList();
+        List<CompanyUserModel> companyUserModels = new ArrayList();
         boolean isSuccess = false;
         String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
         Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
         Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
         List<String> IdsAryList = new ArrayList<>();
-        ObjectManager objManager = null;
-        UserData userData;
         try {
-        	
-        	 /*
-             IF addNewEmpIdsAry.length > 1 || !addNewEmpIdsAry[0].equalsIgnoreCase("")
+            /*
+            IF not bulk
+                TRUE
+                    take object from objManager and add to companyUserModels List to save
+            
+                FALSE
+                    IF addNewEmpIdsAry.length > 1 || !addNewEmpIdsAry[0].equalsIgnoreCase("")
                         TRUE 
-                            take object from upmBankEmployeesMap and add to bankUserModels List to save
+                            take object from COM_SERVICEEmployeesMap and add to companyUserModels List to save
                     IF modifyEmpIdsAry.length > 1 || !modifyEmpIdsAry[0].equalsIgnoreCase("")
                         TRUE
-                            take object from bankEmployeesMap and add to bankUserModels List to save
+                            take object from companyEmployeesMap and add to companyUserModels List to save
             Update event log
              */
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
+           System.out.println("MESSAGE | isBulk :" + isBulk);
+            if (!isBulk) {
+                model = objManager.get("CEMmodelMaster") != null ? (CompanyUserModel) objManager.get("CEMmodelMaster") : new CompanyUserModel();
 
-            String addNewEmpIds = req.getParameter("newIds");// 152,534,......
-            String modifyEmpIds = req.getParameter("modifyIds");// 127,534,......
-            System.out.println("MESSAGE | addNewEmpIds : " + addNewEmpIds);
-            System.out.println("MESSAGE | modifyEmpIds : " + modifyEmpIds);
+                if (model == null) {
+                   System.out.println("ERROR | Can not find a object..");
+                    throw new SBLException("Can not find a object." + ApplicationConstants.ERR_MSG_SESSION_TERMINTATED);
+                }
 
-            companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
-            COM_SERVICEEmployeesMap = objManager.get("COM_SERVICEEmployeesMap") != null ? (HashMap) objManager.get("COM_SERVICEEmployeesMap") : new HashMap();
+                String employeeId = model.getCompanyUserEmpId();
+               System.out.println("MESSAGE | employeeId :" + employeeId + ".");
+                if (validateFieldsFillData(model.getCompanyUserEmpId(), isBulk, req)) {
+                    model = fillObject(model, isBulk, req);
+                   System.out.println("MESSAGE | (NotBulk) model.toString() : " + model.toString());
+                    companyUserModels.add(model);
+                }
 
-            String[] addNewEmpIdsAry = addNewEmpIds.split(",");
-            if (addNewEmpIdsAry.length > 1 || !addNewEmpIdsAry[0].equalsIgnoreCase("")) {
-                for (String employeeId : addNewEmpIdsAry) {
-                    System.out.println("MESSAGE | employeeId :" + employeeId + ".");
-                    model = COM_SERVICEEmployeesMap.get(employeeId);
-                    if (model == null) {
-                        System.out.println("ERROR | Can not find a object..");
-                        throw new SBLException("Can not find a object." + ApplicationConstants.ERR_MSG_SESSION_TERMINTATED);
+            } else {
+                String addNewEmpIds = req.getParameter("newIds");// 152,534,......
+                String modifyEmpIds = req.getParameter("modifyIds");// 127,534,......
+               System.out.println("MESSAGE | addNewEmpIds : " + addNewEmpIds);
+               System.out.println("MESSAGE | modifyEmpIds : " + modifyEmpIds);
+
+                companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+                COM_SERVICEEmployeesMap = objManager.get("COM_SERVICEEmployeesMap") != null ? (HashMap) objManager.get("COM_SERVICEEmployeesMap") : new HashMap();
+
+                String[] addNewEmpIdsAry = addNewEmpIds.split(",");
+                if (addNewEmpIdsAry.length > 1 || !addNewEmpIdsAry[0].equalsIgnoreCase("")) {
+                    for (String employeeId : addNewEmpIdsAry) {
+                       System.out.println("MESSAGE | employeeId :" + employeeId + ".");
+                        model = COM_SERVICEEmployeesMap.get(employeeId);
+                        if (model == null) {
+                           System.out.println("ERROR | Can not find a object..");
+                            throw new SBLException("Can not find a object." + ApplicationConstants.ERR_MSG_SESSION_TERMINTATED);
+                        }
+                        if (validateFieldsFillData(model.getCompanyUserEmpId(), isBulk, req)) {
+                            model = fillObject(model, isBulk, req);
+                           System.out.println("MESSAGE | (addNewEmpIdsAry) model.toString() : " + model.toString());
+                            companyUserModels.add(model);
+                            IdsAryList.add(employeeId);
+                        }
+
                     }
-                    if (validateFieldsFillData(model.getCompanyUserEmpId(), true, req)) {
-                        model = fillObject(model, true, req);
-                        System.out.println("MESSAGE | (addNewEmpIdsAry) model.toString() : " + model.toString());
-                        bankUserModels.add(model);
-                        IdsAryList.add(employeeId);
-                    }
+                }
+                String[] modifyEmpIdsAry = modifyEmpIds.split(",");
+                if (modifyEmpIdsAry.length > 1 || !modifyEmpIdsAry[0].equalsIgnoreCase("")) {
+                    for (String employeeId : modifyEmpIdsAry) {
+                       System.out.println("MESSAGE | employeeId :" + employeeId + ". modifyEmpIdsAry.length : " + modifyEmpIdsAry.length + " . " + modifyEmpIdsAry[0]);
+                        model = companyEmployeesMap.get(employeeId);
+                        if (model == null) {
+                           System.out.println("ERROR | Can not find a object.");
+                            throw new SBLException("Can not find a object." + ApplicationConstants.ERR_MSG_SESSION_TERMINTATED);
+                        }
+                        if (validateFieldsFillData(model.getCompanyUserEmpId(), isBulk, req)) {
+                            model = fillObject(companyEmployeesMap.get(employeeId), isBulk, req);
+                           System.out.println("MESSAGE | (modifyEmpIdsAry) model.toString() : " + model.toString());
+                            companyUserModels.add(model);
+                            IdsAryList.add(employeeId);
+                        }
 
+                    }
                 }
             }
-            String[] modifyEmpIdsAry = modifyEmpIds.split(",");
-            if (modifyEmpIdsAry.length > 1 || !modifyEmpIdsAry[0].equalsIgnoreCase("")) {
-                for (String employeeId : modifyEmpIdsAry) {
-                    System.out.println("MESSAGE | employeeId :" + employeeId + ". modifyEmpIdsAry.length : " + modifyEmpIdsAry.length + " . " + modifyEmpIdsAry[0]);
-                    model = companyEmployeesMap.get(employeeId);
-                    if (model == null) {
-                        System.out.println("ERROR | Can not find a object.");
-                        throw new SBLException("Can not find a object." + ApplicationConstants.ERR_MSG_SESSION_TERMINTATED);
-                    }
-                    if (validateFieldsFillData(model.getCompanyUserEmpId(), true, req)) {
-                        model = fillObject(companyEmployeesMap.get(employeeId), true, req);
-                        System.out.println("MESSAGE | (modifyEmpIdsAry) model.toString() : " + model.toString());
-                        bankUserModels.add(model);
-                        IdsAryList.add(employeeId);
-                    }
-
-                }
-            }
-            if (bankUserModels.size() <= 0) {
+            if (companyUserModels.size() <= 0) {
                 throw new SBLException("No reviced objects to save.");
             }
-            isSuccess = companyUserLogic.saveCompanyUser(bankUserModels, IdsAryList, userData);
-/*
+            isSuccess = companyUserLogic.saveCompanyUser(companyUserModels, IdsAryList, userData);
+
             if (isSuccess) {
 
-                for (CompanyUserModel userModel : bankUserModels) {
+                for (CompanyUserModel userModel : companyUserModels) {
                     eventAction = ApplicationConstants.actionTypeDesc(userModel.getActionType());
-                    eventDesc = "Bank user temp Id : " + userModel.getBankUserTmpId() + ", Save - ";
+                    eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Save - ";
                     masterObjectToString = "";
-                    tempObjectToString = ((DvmBankUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
+                    tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
                     // Write to event log table.
-                    EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
+                    eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
                 }
                 req.setAttribute("rtnMsg", "Successfully Save.");
             }
-*/
+
             //eventAction = "";
             //eventDesc = "Save bank user in temp table.";
             //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", "", "", ApplicationConstants.EVENTSUCCESSFUL);
             req.setAttribute("rtnMsg", "Successfully save.");
-            
         } catch (SBLException ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
+            eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
+           System.out.println("ERROR | " + ex.getMessage());
+            throw new SBLException(ex.getMessage());
         } catch (Exception ex) {
-            System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
+            eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
+           System.out.println("ERROR | " + ex.getMessage());
+           System.out.println("ERROR   | " + ex.getMessage() + "\n");
+            throw new SBLException("Unable to save employee details");
         }
 
-        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
-        return new ModelAndView("employee/existingEmp");
+       System.out.println("LEFT    |  BankEmployeeMngAction.saveEmployeeDetails()");
+    }
+	
+	
+//-------------------------------------------------------------------------------------------------------------------------------------	
+	
+	
+	@RequestMapping(value = { "/CompanyEmployee/RejectEmp"})
+	public String rejectEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+		System.out.println("ENTERED | CompanyEmployeeMngController.rejectEmployeeDetails()");
+        CompanyUserModel model;
+        List<CompanyUserModel> companyUserModels = new ArrayList();
+        boolean isSuccess = false;
+        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
+        ObjectManager objManager = null;
+        UserData userData = null;
+        try {
+            /*
+            IF IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")
+                TRUE 
+                    take object from companyEmployeesMap and add to companyUserModels List to reject
+            
+            Update event log
+             */
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		throw new Exception(result);
+        		//req.setAttribute("errMsg", result);
+        		//return new ModelAndView("includes/include-dashboard");
+        	}
+        	
+            Map<String, CompanyUserModel> companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+            String reason = req.getParameter("rejectReason");
+            String ids = req.getParameter("ids");
+            System.out.println("MESSAGE | reason : " + reason + " ,ids : " + ids);
+
+            if (!APPUtills.isThisStringValid(reason)) {
+                throw new SBLException("Comment is required.");
+            }
+
+            String[] IdsAry = ids.split(",");
+            if (IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")) {
+                for (String id : IdsAry) {
+                    model = companyEmployeesMap.get(id);
+
+                    model.setAuthComment(reason);
+                    model.setModifiedBy(Integer.parseInt(userData.getUSER_ID()));
+                    model.setModifiedDate(APPUtills.getCurrentDate());
+                    model.setRecStatus(ApplicationConstants.RECORD_STATUS_REJECT);
+
+                    companyUserModels.add(model);
+                }
+                List<String> IdsAryList = new ArrayList<>(Arrays.asList(IdsAry));
+                Map<String, CompanyUserModel> companyEmployeesMapMaster = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, IdsAryList, null);
+                isSuccess = companyUserLogic.rejectCompanyUser(companyUserModels, IdsAryList, userData);
+                System.out.println("MESSAGE | Is bank user rejected ? " + isSuccess);
+
+                if (isSuccess) {
+
+                   for (CompanyUserModel userModel : companyUserModels) {
+                        eventAction = ApplicationConstants.actionTypeDesc(userModel.getActionType());
+                        eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Reject - ";
+                        masterObjectToString = userModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_MODIFY) ? ((CompanyUserMaster) companyEmployeesMapMaster.get(userModel.getCompanyUserEmpId()).modelToObject(ApplicationConstants.MASTER_DATA)).toString() : "";
+                        tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
+                        // Write to event log table.
+                        eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
+                    }
+                    req.setAttribute("rtnMsg", "Successfully Rejected.");
+                }
+            } else {
+                System.out.println("ERROR | No ids recived to reject.");
+                throw new SBLException("Please select rows to reject.");
+            }
+
+        } catch (SBLException ex) {
+            eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, "", "Reject - Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
+            System.out.println("ERROR | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+        } catch (Exception ex) {
+            eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, "", "Reject -Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
+            System.out.println("ERROR | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeMngController.rejectEmployeeDetails()");
+        //return new ModelAndView("employee/pendingEmp");
+        return "redirect:/employee/pendingEmp";
+		
+	}
+		
+	@RequestMapping(value = { "/CompanyEmployee/RemoveEmp"})
+	public String removeEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+		System.out.println("ENTERED |  CompanyEmployeeMngController.removeEmployeeDetails()");
+        List<CompanyUserModel> companyUserModels = new ArrayList();
+
+        boolean isSuccess = false;
+        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
+        ObjectManager objManager = null;
+        UserData userData = null;
+        try {
+            /*
+            IF IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")
+                TRUE 
+                    take object from companyEmployeesMap and add to companyUserModels List to remove
+            
+            Update event log
+             */
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		throw new Exception(result);        		
+        	}
+
+            Map<String, CompanyUserModel> companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+            String ids = req.getParameter("ids");
+            System.out.println("MESSAGE | ids : " + ids);
+
+            String[] IdsAry = ids.split(",");
+            if (IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")) {
+                for (String id : IdsAry) {
+                	companyUserModels.add(companyEmployeesMap.get(id));
+                }
+
+                isSuccess = companyUserLogic.deleteCompanyUser(companyUserModels);
+                System.out.println("MESSAGE | Is bank user Deleted ? " + isSuccess);
+
+                if (isSuccess) {
+
+                    for (CompanyUserModel userModel : companyUserModels) {
+                        eventAction = "";
+                        eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Delete - ";
+                        masterObjectToString = "";
+                        tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
+                        // Write to event log table.
+                        eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
+                    }
+                    req.setAttribute("rtnMsg", "Successfully delete.");
+                }
+            } else {
+                System.out.println("ERROR | No ids recived to reject.");
+                throw new SBLException("Please select rows to reject.");
+            }
+        } catch (SBLException ex) {
+            eventLogger.doLog(req,  (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, eventAction, " Delete - Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
+            System.out.println("ERROR | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+        } catch (Exception ex) {
+            eventLogger.doLog(req,  (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, eventAction, " Delete - Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
+            System.out.println("ERROR | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeMngController.removeEmployeeDetails()");
+        //return new ModelAndView("employee/pendingEmp");
+        return "redirect:/employee/pendingEmp";
 		
 	}
 	
+	@RequestMapping(value = { "/CompanyEmployee/VerifyEmp"})
+	public String verifyEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+		System.out.println("ENTERED | CompanyEmployeeMngController.verifyEmployeeDetails()");
+        CompanyUserModel model;
+        List<CompanyUserModel> companyUserModels = new ArrayList();
+        boolean isSuccess = false;
+        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
+        ObjectManager objManager = null;
+        UserData userData = null;
+        try {
+            /*
+            IF IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")
+                TRUE 
+                    take object from companyEmployeesMap and add to companyUserModels List to verify
+            
+            Update event log
+             */
+        	
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		throw new Exception(result);        		        		
+        	}
+
+            Map<String, CompanyUserModel> companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+            String reason = req.getParameter("rejectReason");
+            String ids = req.getParameter("ids");
+            System.out.println("MESSAGE | reason : " + reason + " ,ids : " + ids);
+
+            String[] IdsAry = ids.split(",");
+            if (IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")) {
+                for (String id : IdsAry) {
+                    model = companyEmployeesMap.get(id);
+
+                    model.setAuthComment(reason);
+                    model.setVerifiedBy(Integer.parseInt(userData.getUSER_ID()));
+                    model.setVerifiedDate(APPUtills.getCurrentDate());
+                    model.setRecStatus(ApplicationConstants.RECORD_STATUS_VERIFY);
+
+                    companyUserModels.add(model);
+                }
+                List<String> IdsAryList = new ArrayList<>(Arrays.asList(IdsAry));
+                Map<String, CompanyUserModel> companyEmployeesMapMaster = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, IdsAryList, null);
+                isSuccess = companyUserLogic.verifyCompanyUser(companyUserModels, IdsAryList);
+                System.out.println("MESSAGE | Is bank user verified ? " + isSuccess);
+
+                if (isSuccess) {
+
+                    for (CompanyUserModel userModel : companyUserModels) {
+                        eventAction = ApplicationConstants.actionTypeDesc(userModel.getActionType());
+                        eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Verification - ";
+                        masterObjectToString = userModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_MODIFY) ? ((CompanyUserMaster) companyEmployeesMapMaster.get(userModel.getCompanyUserEmpId()).modelToObject(ApplicationConstants.MASTER_DATA)).toString() : "";
+                        tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
+                        // Write to event log table.
+                        eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
+                    }
+                    req.setAttribute("rtnMsg", "Successfully verified.");
+                }
+            } else {
+                System.out.println("ERROR | No ids recived to verify.");
+                throw new SBLException("Please select rows to verify.");
+            }
+
+        } catch (SBLException ex) {
+            eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, "", "Verification - Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
+            System.out.println("ERROR | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+        } catch (Exception ex) {
+            eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, "", "Verification -Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
+            System.out.println("ERROR | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeMngController.verifyEmployeeDetails()");
+        //return new ModelAndView("employee/pendingEmp");
+        return "redirect:/employee/pendingEmp";
+		
+	}
+
+
+//-------------------------------------------------------------------------------------------------------------------------------------	
+
+
 	private boolean validateFieldsFillData(String empId, boolean isBulk, HttpServletRequest req) throws SBLException {
        System.out.println("ENTERED | CompanyEmployeeMngController.validateFields()");
         String errorStrg = "";
@@ -877,224 +1184,23 @@ public class CompanyEmployeeMngController {
         return fileType.equalsIgnoreCase("PNG") || fileType.equalsIgnoreCase("JPG") || fileType.equalsIgnoreCase("JPEG");
     }
 		
-	@RequestMapping(value = { "/CompanyEmployee/RejectEmp"})
-	public ModelAndView rejectEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
-		System.out.println("ENTERED | CompanyEmployeeMngController.rejectEmployeeDetails()");
-        CompanyUserModel model;
-        List<CompanyUserModel> companyUserModels = new ArrayList();
-        boolean isSuccess = false;
-        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
-        ObjectManager objManager = null;
-        UserData userData;
-        try {
-            /*
-            IF IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")
-                TRUE 
-                    take object from bankEmployeesMap and add to bankUserModels List to reject
-            
-            Update event log
-             */
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
-        	
-            Map<String, CompanyUserModel> companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
-            String reason = req.getParameter("rejectReason");
-            String ids = req.getParameter("ids");
-            System.out.println("MESSAGE | reason : " + reason + " ,ids : " + ids);
+	public String checkSessionTimeOut(UserData userData,ObjectManager objManager){
+		try{
+			if (userData == null) {
+	            objManager.remove("userType");
+	            objManager.cleanup(ApplicationConstants.SCOPE_GLOBAL);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMPANY_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMMON_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_FD_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMMON_VIEW);
 
-            if (!APPUtills.isThisStringValid(reason)) {
-                throw new SBLException("Comment is required.");
-            }
-
-            String[] IdsAry = ids.split(",");
-            if (IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")) {
-                for (String id : IdsAry) {
-                    model = companyEmployeesMap.get(id);
-
-                    model.setAuthComment(reason);
-                    model.setModifiedBy(Integer.parseInt(userData.getUSER_ID()));
-                    model.setModifiedDate(APPUtills.getCurrentDate());
-                    model.setRecStatus(ApplicationConstants.RECORD_STATUS_REJECT);
-
-                    companyUserModels.add(model);
-                }
-                List<String> IdsAryList = new ArrayList<>(Arrays.asList(IdsAry));
-                Map<String, CompanyUserModel> bankEmployeesMapMaster = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, IdsAryList, null);
-                isSuccess = companyUserLogic.rejectCompanyUser(companyUserModels, IdsAryList, userData);
-                System.out.println("MESSAGE | Is bank user rejected ? " + isSuccess);
-
-                if (isSuccess) {
-
-                   /* for (CompanyUserModel userModel : companyUserModels) {
-                        eventAction = ApplicationConstants.actionTypeDesc(userModel.getActionType());
-                        eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Reject - ";
-                        masterObjectToString = userModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_MODIFY) ? ((CompanyUserMaster) bankEmployeesMapMaster.get(userModel.getCompanyUserEmpId()).modelToObject(ApplicationConstants.MASTER_DATA)).toString() : "";
-                        tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
-                        // Write to event log table.
-                        EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
-                    }*/
-                    req.setAttribute("rtnMsg", "Successfully Rejected.");
-                }
-            } else {
-                System.out.println("ERROR | No ids recived to reject.");
-                throw new SBLException("Please select rows to reject.");
-            }
-
-        } catch (SBLException ex) {
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, "", "Reject - Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
-            System.out.println("ERROR | " + ex.getMessage());
-            //throw new SBLException(ex.getMessage());
-        } catch (Exception ex) {
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, "", "Reject -Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
-            System.out.println("ERROR | " + ex.getMessage());
-            System.out.println("ERROR   | " + ex.getMessage() + "\n");
-            //throw new SBLException("Unable to reject employee details");
-        }
-
-        System.out.println("LEFT    | CompanyEmployeeMngController.rejectEmployeeDetails()");
-        return new ModelAndView("employee/pendingEmp");
-		
-	}
-		
-	@RequestMapping(value = { "/CompanyEmployee/RemoveEmp"})
-	public ModelAndView removeEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
-		System.out.println("ENTERED |  CompanyEmployeeMngController.removeEmployeeDetails()");
-        List<CompanyUserModel> companyUserModels = new ArrayList();
-
-        boolean isSuccess = false;
-        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
-        ObjectManager objManager = null;
-        UserData userData;
-        try {
-            /*
-            IF IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")
-                TRUE 
-                    take object from bankEmployeesMap and add to bankUserModels List to remove
-            
-            Update event log
-             */
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
-
-            Map<String, CompanyUserModel> bankEmployeesMap = objManager.get("bankEmployeesMap") != null ? (HashMap) objManager.get("bankEmployeesMap") : new HashMap();
-            String ids = req.getParameter("ids");
-            System.out.println("MESSAGE | ids : " + ids);
-
-            String[] IdsAry = ids.split(",");
-            if (IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")) {
-                for (String id : IdsAry) {
-                	companyUserModels.add(bankEmployeesMap.get(id));
-                }
-
-                isSuccess = companyUserLogic.deleteCompanyUser(companyUserModels);
-                System.out.println("MESSAGE | Is bank user Deleted ? " + isSuccess);
-
-                if (isSuccess) {
-
-                    for (CompanyUserModel userModel : companyUserModels) {
-                        eventAction = "";
-                        eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Delete - ";
-                        masterObjectToString = "";
-                        tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
-                        // Write to event log table.
-                        //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
-                    }
-                    req.setAttribute("rtnMsg", "Successfully delete.");
-                }
-            } else {
-                System.out.println("ERROR | No ids recived to reject.");
-                throw new SBLException("Please select rows to reject.");
-            }
-        } catch (SBLException ex) {
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, " Delete - Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
-            System.out.println("ERROR | " + ex.getMessage());
-            //throw new SBLException(ex.getMessage());
-        } catch (Exception ex) {
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, " Delete - Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
-            System.out.println("ERROR | " + ex.getMessage());
-            System.out.println("ERROR   | " + ex.getMessage() + "\n");
-            //throw new SBLException("Unable to reject employee details");
-        }
-
-        System.out.println("LEFT    | CompanyEmployeeMngController.removeEmployeeDetails()");
-        return new ModelAndView("employee/pendingEmp");
-		
-	}
-	
-	@RequestMapping(value = { "/CompanyEmployee/VerifyEmp"})
-	public ModelAndView verifyEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
-		System.out.println("ENTERED | CompanyEmployeeMngController.verifyEmployeeDetails()");
-        CompanyUserModel model;
-        List<CompanyUserModel> bankUserModels = new ArrayList();
-        boolean isSuccess = false;
-        String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
-        ObjectManager objManager = null;
-        UserData userData;
-        try {
-            /*
-            IF IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")
-                TRUE 
-                    take object from bankEmployeesMap and add to bankUserModels List to verify
-            
-            Update event log
-             */
-        	
-        	objManager = new ObjectManager(session);
-        	userData = (UserData) objManager.get("userData");
-
-            Map<String, CompanyUserModel> bankEmployeesMap = objManager.get("bankEmployeesMap") != null ? (HashMap) objManager.get("bankEmployeesMap") : new HashMap();
-            String reason = req.getParameter("rejectReason");
-            String ids = req.getParameter("ids");
-            System.out.println("MESSAGE | reason : " + reason + " ,ids : " + ids);
-
-            String[] IdsAry = ids.split(",");
-            if (IdsAry.length > 1 || !IdsAry[0].equalsIgnoreCase("")) {
-                for (String id : IdsAry) {
-                    model = bankEmployeesMap.get(id);
-
-                    model.setAuthComment(reason);
-                    model.setVerifiedBy(Integer.parseInt(userData.getUSER_ID()));
-                    model.setVerifiedDate(APPUtills.getCurrentDate());
-                    model.setRecStatus(ApplicationConstants.RECORD_STATUS_VERIFY);
-
-                    bankUserModels.add(model);
-                }
-                List<String> IdsAryList = new ArrayList<>(Arrays.asList(IdsAry));
-                Map<String, CompanyUserModel> bankEmployeesMapMaster = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, IdsAryList, null);
-                isSuccess = companyUserLogic.verifyCompanyUser(bankUserModels, IdsAryList);
-                System.out.println("MESSAGE | Is bank user verified ? " + isSuccess);
-
-                if (isSuccess) {
-
-                    for (CompanyUserModel userModel : bankUserModels) {
-                        eventAction = ApplicationConstants.actionTypeDesc(userModel.getActionType());
-                        eventDesc = "Bank user temp Id : " + userModel.getCompanyUserTmpId() + ", Verification - ";
-                        masterObjectToString = userModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_MODIFY) ? ((CompanyUserMaster) bankEmployeesMapMaster.get(userModel.getCompanyUserEmpId()).modelToObject(ApplicationConstants.MASTER_DATA)).toString() : "";
-                        tempObjectToString = ((CompanyUserTmp) userModel.modelToObject(ApplicationConstants.TEMP_DATA)).toString();
-                        // Write to event log table.
-                        //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", masterObjectToString, tempObjectToString, ApplicationConstants.EVENTSUCCESSFUL);
-                    }
-                    req.setAttribute("rtnMsg", "Successfully verified.");
-                }
-            } else {
-                System.out.println("ERROR | No ids recived to verify.");
-                throw new SBLException("Please select rows to verify.");
-            }
-
-        } catch (SBLException ex) {
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, "", "Verification - Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
-            System.out.println("ERROR | " + ex.getMessage());
-            //throw new SBLException(ex.getMessage());
-        } catch (Exception ex) {
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, "", "Verification -Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
-            System.out.println("ERROR | " + ex.getMessage());
-            System.out.println("ERROR   | " + ex.getMessage() + "\n");
-            //throw new SBLException("Unable to verify employee details");
-        }
-
-        System.out.println("LEFT    | CompanyEmployeeMngController.verifyEmployeeDetails()");
-        return new ModelAndView("employee/pendingEmp");
-		
+	            return ApplicationConstants.ERR_MSG_SESSION_TERMINTATED;
+	        }else{
+	        	return "";
+	        }
+		}catch (Exception e) {
+			return "Error in checking session terminated";	
+		}
 	}
 }
 

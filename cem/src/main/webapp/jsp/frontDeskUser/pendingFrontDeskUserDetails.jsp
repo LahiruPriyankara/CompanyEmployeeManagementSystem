@@ -3,6 +3,9 @@
     Created on : Dec 22, 2020, 11:08:45 AM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
 
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="com.company.models.FdUserModel"%>

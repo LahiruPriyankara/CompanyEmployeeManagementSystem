@@ -7,6 +7,7 @@ import com.company.dto.CompanyUserTmp;
 import com.company.dto.EventLogTbl;
 import com.company.dto.FdUserMaster;
 import com.company.dto.FdUserTmp;
+import com.company.dto.SequenceNumber;
 import com.company.dto.UserReference;
 
 public class DbConnection {
@@ -23,7 +24,7 @@ public class DbConnection {
 
 	public Configuration getConnection() {
 		return new Configuration().configure().addAnnotatedClass(CompanyUserMaster.class).addAnnotatedClass(CompanyUserTmp.class)
-				.addAnnotatedClass(EventLogTbl.class).addAnnotatedClass(FdUserMaster.class).addAnnotatedClass(FdUserTmp.class).addAnnotatedClass(UserReference.class);
+				.addAnnotatedClass(EventLogTbl.class).addAnnotatedClass(FdUserMaster.class).addAnnotatedClass(FdUserTmp.class).addAnnotatedClass(UserReference.class).addAnnotatedClass(SequenceNumber.class);
 
 	}
 }

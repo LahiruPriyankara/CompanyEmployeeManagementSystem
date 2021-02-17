@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.company.dao.FDUserMasterFacadeLocal;
 import com.company.dao.FDUserTmpFacadeLocal;
+import com.company.dao.SeqNumberGeneratorFacadeLocal;
 import com.company.dto.FdUserMaster;
 import com.company.models.FdUserModel;
 import com.company.models.UserData;
@@ -36,6 +37,9 @@ public class FDUserLogic implements FDUserLogicLocal {
 	
 	@Autowired
 	FDUserTmpFacadeLocal fDUserTmpFacade;
+	
+	@Autowired
+	SeqNumberGeneratorFacadeLocal seqNumberGeneratorFacade;
 	
 	@Override
     public Map<Integer, FdUserModel> getFdUsers(String tableType, List<Integer> ids) throws Exception {
@@ -210,6 +214,88 @@ public class FDUserLogic implements FDUserLogicLocal {
         System.out.println("LEFT    | FDUserLogic.saveFdUser()");
         return isSuccess;
     }
+    
+    @Override
+    public boolean saveFdUserResetPassword(FdUserModel fdUserModel, UserData userData) throws Exception {
+        System.out.println("ENTERED | FDUserLogic.saveFdUserResetPassword()");
+        boolean isSuccess = true;
+      try {
+            fdUserModel.setModifiedBy(Integer.parseInt(userData.getUSER_ID()));
+            fdUserModel.setModifiedDate(APPUtills.getCurrentDate());
+            fDUserTmpFacade.modifyUser(fdUserModel,2);            
+
+        } catch (Exception ex) {
+            Log.error("ERROR   | Unable to save front desak user in temp table." + ex.getMessage(), ex);
+            throw new SBLException("Unable to save front desak user in temp table..");
+        }
+        System.out.println("LEFT    | FDUserLogic.saveFdUserResetPassword()");
+        return isSuccess;
+    }
+    
+    @Override
+    public boolean verifyFdUserResetPassword(FdUserModel fdUserModel, UserData userData) throws Exception {
+        System.out.println("ENTERED | FDUserLogic.verifyFdUserResetPassword()");
+        boolean isSuccess = true;
+        HttpURLConnection conn = null;
+        URL url;
+        String serviceUrl;
+        BufferedReader br;
+        String response = "",responseFromBR;
+      try {
+            Map<Integer, FdUserModel> userMap = fDUserTmpFacade.getTempFdUsers(Arrays.asList(fdUserModel.getFdUserTmpId()), ApplicationConstants.TEMP_DATA);
+
+            if (userMap.isEmpty()) {
+                Log.error("ERROR   | Bellow record is already verified.");
+                throw new SBLException("Bellow record is already verified.");
+            }
+            
+            serviceUrl = ApplicationConstants.UNLOCK_PASSWD_NON_COMPANY_USER + "/" + fdUserModel.getFdUserName();
+            System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
+            url = new URL(serviceUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json");
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            	System.out.println("ERROR   | Failed : HTTP error code : " + conn.getResponseCode());
+                throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+            }
+            br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            response = "";
+            responseFromBR="";
+            while ((responseFromBR = br.readLine()) != null) {
+            	System.out.println("MESSAGE | Response : " + responseFromBR);
+            	response = responseFromBR;
+            }
+            
+            if(!response.equalsIgnoreCase("true")){
+            	throw new SBLException("Can not active the password.Please try again later.");
+            }	
+            
+            fdUserModel.setVerifiedBy(Integer.parseInt(userData.getUSER_ID()));
+            fdUserModel.setVerifiedDate(APPUtills.getCurrentDate());
+            fdUserModel.setRecStatus(ApplicationConstants.RECORD_STATUS_VERIFY);
+            fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD_AUTH);
+            
+            System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
+            
+            //Update Master Table
+        	fDUserMasterFacade.modifyUser(fdUserModel,2);
+            
+            //Update Temp Table
+            fDUserTmpFacade.modifyUser(fdUserModel,2);
+            
+
+        } catch (SBLException ex) {
+            Log.error("ERROR   | Unable to save front desak user in temp table." + ex.getMessage(), ex);
+            throw new SBLException(ex.getMessage());
+        } catch (Exception ex) {
+            Log.error("ERROR   | Unable to save front desak user in temp table." + ex.getMessage(), ex);
+            throw new SBLException("Unable to save front desak user in temp table..");
+        }
+        System.out.println("LEFT    | FDUserLogic.verifyFdUserResetPassword()");
+        return isSuccess;
+    }
 
     @Override
     public boolean rejectFdUser(FdUserModel fdUserModel, UserData userData) throws Exception {
@@ -310,6 +396,99 @@ public class FDUserLogic implements FDUserLogicLocal {
             throw new SBLException(ex.getMessage());
         }
         System.out.println("LEFT    | FDUserLogic.verifyUser()");
+        return isSuccess;
+    }
+    
+    
+    @Override
+    public boolean setPasswordDEDirectryUser(String userName, String userPassword) throws SBLException {
+       System.out.println("ENTERED | DedFDUserLogic.setPasswordDEDirectryUser()");
+        boolean isSuccess = false;
+        HttpURLConnection conn = null;
+        URL url;
+        String serviceUrl;
+        BufferedReader br;
+        String response = "",responseFromBR;
+        try {
+        	FdUserModel fdUserModel = getFdUserByUserName(Arrays.asList(userName));
+            Map<Integer, FdUserModel> userMap = fDUserTmpFacade.getTempFdUsers(Arrays.asList(fdUserModel.getFdUserMasterId()), ApplicationConstants.MASTER_DATA);
+
+            
+            String status = fdUserModel.getSecurepassUserStatus()!=null?fdUserModel.getSecurepassUserStatus():"";
+            
+        	if(status.equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD_AUTH)){     //Going to reset old password   		
+        		serviceUrl = ApplicationConstants.SET_PASSWD_NON_COMPANY_USER + "/" + userName+"/"+userPassword;
+                System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
+                url = new URL(serviceUrl);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json");
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                	System.out.println("ERROR   | Failed : HTTP error code : " + conn.getResponseCode());
+                    throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                }
+                br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                response = "";
+                responseFromBR="";
+                while ((responseFromBR = br.readLine()) != null) {
+                	System.out.println("MESSAGE | Response : " + responseFromBR);
+                	response = responseFromBR;
+                }
+                
+                if(!response.equalsIgnoreCase("true")){
+                	throw new SBLException("Can not active the password.Please try again later.");
+                }
+                
+                fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_ACTIVE);
+                System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
+                fDUserMasterFacade.modifyUser(fdUserModel,2);
+                
+        	}else{ //Going to set new password  
+                
+                if (userMap.size() > 0) {
+                    System.out.println("ERROR   | Password is already sent for authorization.");
+                     throw new SBLException("Password is already sent for authorization.");
+                 }
+                 
+                 System.out.println("MESSAGE | Successfully set the password.");
+
+                 fdUserModel.setFdUserTmpId(seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.FD_USER_TMP_ID));
+                 fdUserModel.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
+                 fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD);
+
+                System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
+                fDUserTmpFacade.modifyUser(fdUserModel,1);
+        	}            
+
+            //SETTING USER PASSWORD SUCCESSFULLY
+            isSuccess = true;
+           System.out.println("MESSAGE |  User Password Set Successfull");
+        } catch (SBLException e) {
+           System.out.println("ERROR   | " + e.getMessage());
+            throw new SBLException(e.getMessage());
+        } catch (Exception e) {
+           System.out.println("ERROR   | " + e.getMessage());
+            throw new SBLException("User Password Set fail.");
+        }
+       System.out.println("LEFT    | DedFDUserLogic.setPasswordDEDirectryUser()");
+        return isSuccess;
+    }
+    
+    
+    @Override
+    public boolean updateFdUserPasswordLock(FdUserModel fdUserModel) throws Exception {
+        System.out.println("ENTERED | FDUserLogic.updateFdUserPasswordLock()");
+        boolean isSuccess = true;
+        try {
+            System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
+            fDUserMasterFacade.modifyUser(fdUserModel,2);
+        } catch (Exception ex) {
+            Log.error("ERROR   | Unable to lock password." + ex.getMessage(), ex);
+            isSuccess = false;
+            //throw new SBLException("Unable to dalete.Please try again.");
+        }
+        System.out.println("LEFT    | FDUserLogic.updateFdUserPasswordLock()");
         return isSuccess;
     }
 

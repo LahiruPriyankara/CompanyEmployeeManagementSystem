@@ -105,6 +105,7 @@ function selectAll(source) {
 myFunction();
 
 function clickOnTab(uri) {
+	console.log(uri);
     if (uri !== "") {
         hidePage();
         $.post(uri, {}, function (data) {

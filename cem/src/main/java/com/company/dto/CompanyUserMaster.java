@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
@@ -33,8 +35,6 @@ public class CompanyUserMaster implements Serializable {
 	// @Max(value=?) @Min(value=?)//if you know range of your decimal fields
 	// consider using these annotations to enforce field validation
 	@Id
-	@Basic(optional = false)
-	@NotNull
 	@Column(name = "COMPANY_USER_MASTER_ID")
 	private int companyUserMasterId;
 	@Size(max = 6)

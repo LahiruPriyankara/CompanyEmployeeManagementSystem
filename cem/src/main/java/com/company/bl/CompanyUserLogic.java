@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.company.common.ApplicationConstants;
@@ -21,8 +22,7 @@ import com.company.dao.CompanyUserMasterFacade;
 import com.company.dao.CompanyUserMasterFacadeLocal;
 import com.company.dao.CompanyUserTmpFacade;
 import com.company.dao.CompanyUserTmpFacadeLocal;
-import com.company.dao.SeqNumberGeneratorBean;
-import com.company.dao.SeqNumberGeneratorBeanLocal;
+import com.company.dao.SeqNumberGeneratorFacadeLocal;
 import com.company.models.CompanyUserModel;
 import com.company.models.DivInfo;
 import com.company.models.UserData;
@@ -41,8 +41,8 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
     
     @Autowired
     private CompanyUserTmpFacadeLocal companyUserTmpFacade;
-    //@Autowired
-    //private SeqNumberGeneratorBeanLocal seqNumberGeneratorBean = new SeqNumberGeneratorBean();
+    @Autowired
+    private SeqNumberGeneratorFacadeLocal seqNumberGeneratorFacade;
     @Autowired
     private CompanyUserMasterFacadeLocal companyUserMasterFacade;
 
@@ -189,6 +189,7 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
 		URL url;
         String serviceUrl;
         BufferedReader br;
+        String response = "";
         String responseFromBR;
         UserData uData;
         HashMap<String, UserData> COM_SERVICEEmployeesMap = new HashMap();
@@ -218,13 +219,21 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
                 throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
             }
             br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-            responseFromBR = "";
+
             while ((responseFromBR = br.readLine()) != null) {
             	System.out.println("MESSAGE | Response : " + responseFromBR);
-            	uData = new UserData();
+            	response = responseFromBR;
+            }
+            
+            
+            JSONArray jsonArray = new JSONArray(response);
+        	System.out.println("MESSAGE | jsonArray.length() : " + jsonArray.length());
+        	for(int i = 0;i<jsonArray.length();i++){
+        		JSONObject jSONObject = jsonArray.getJSONObject(i);
+                
+        		uData = new UserData();
             	uData.setUSER_TYPE(ApplicationConstants.BANK_DEP_USER);
-
-                JSONObject jSONObject = new JSONObject(responseFromBR);
+            	
                 uData.setUSER_ID(jSONObject.get("id") != null ? jSONObject.get("id").toString() : "");
                 uData.setFIRST_NAME(jSONObject.get("user_first_name") != null ? jSONObject.get("user_first_name").toString() : "");
                 uData.setLAST_NAME(jSONObject.get("user_last_name") != null ? jSONObject.get("user_last_name").toString() : "");
@@ -234,7 +243,8 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
                 uData.setAD_USER_ID(jSONObject.get("user_id") != null ? jSONObject.get("user_id").toString() : "");
                 
                 COM_SERVICEEmployeesMap.put(uData.getAD_USER_ID(), uData);
-            }
+        	}
+            
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             throw new SBLException(ex.getMessage());
@@ -257,7 +267,7 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
 		URL url;
         String serviceUrl;
         BufferedReader br;
-        String responseFromBR;
+        String response,responseFromBR;
         DivInfo info;
         HashMap<String, DivInfo> divInfoMap = new HashMap();//to store sol infomation
         
@@ -275,17 +285,25 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
                 throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
             }
             br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-            responseFromBR = "";
+            response = "";
             while ((responseFromBR = br.readLine()) != null) {
-            	System.out.println("MESSAGE | Response : " + responseFromBR);
-            	info = new DivInfo();
-
-                JSONObject jSONObject = new JSONObject(responseFromBR);
+            	response = responseFromBR;
+            	System.out.println("MESSAGE | Response : " + response);            	
+            }
+            
+            
+        	JSONArray jsonArray = new JSONArray(response);
+        	System.out.println("MESSAGE | jsonArray.length() : " + jsonArray.length());
+        	for(int i = 0;i<jsonArray.length();i++){
+        		JSONObject jSONObject = jsonArray.getJSONObject(i);
+                
+                info = new DivInfo();
                 info.setDivId(jSONObject.get("depId") != null ? jSONObject.get("depId").toString() : "");
                 info.setName(jSONObject.get("dep_name") != null ? jSONObject.get("dep_name").toString() : "");
                 
                 divInfoMap.put(info.getDivId(), info);
-            }
+        	}
+            
         }catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             throw new SBLException("Unable to get employee from company service");

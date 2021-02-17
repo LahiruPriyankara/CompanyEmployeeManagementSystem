@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.company.bl.CompanyUserLogicLocal;
+import com.company.bl.EventLoggerLocal;
 import com.company.bl.FDUserLogicLocal;
 import com.company.bl.UserReferenceLogicLocal;
 import com.company.common.APPUtills;
@@ -29,6 +30,7 @@ import com.company.common.SBLException;
 import com.company.models.CompanyUserModel;
 import com.company.models.FdUserModel;
 import com.company.models.UserData;
+import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
 
 @Controller
@@ -39,8 +41,8 @@ public class CompanyEmployeeAuthenticate {
 	@Autowired
     private FDUserLogicLocal fdUserLogic;
 	
-	//@Autowired
-    //private EventLoggerLocal eventLogger = new EventLogger();
+	@Autowired
+    private EventLoggerLocal eventLogger;
 	
 	@Autowired
     private CompanyUserLogicLocal companyUserLogic;
@@ -49,7 +51,7 @@ public class CompanyEmployeeAuthenticate {
     private UserReferenceLogicLocal userReferenceLogic;
 
 	
-	@RequestMapping(value = { "/authonticate","/authonticate/RedirectLogin" })
+	@RequestMapping(value = {"/", "/authonticate","/authonticate/RedirectLogin"})
 	public ModelAndView loginPage(){
 		try {
 			return new ModelAndView("main/login");          
@@ -59,15 +61,45 @@ public class CompanyEmployeeAuthenticate {
 	}
 	
 	@RequestMapping(value = { "/authonticate/LoadDashboard" })
-	public ModelAndView LoadDashboard(){
+	public ModelAndView LoadDashboard(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+		ObjectManager objManager = null;
+		UserData userData = null;
 		try {
-			return new ModelAndView("main/login");          
+			objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+			
+			return new ModelAndView("includes/include-dashboard");          
         } catch (Exception ex) {
-        	return new ModelAndView("main/login");   
+        	return new ModelAndView("includes/include-dashboard");   
         }		
 	}
 	
-	@RequestMapping(value = { "/authonticate/UserLogin" })
+	public String checkSessionTimeOut(UserData userData,ObjectManager objManager){
+		try{
+			if (userData == null) {
+	            objManager.remove("userType");
+	            objManager.cleanup(ApplicationConstants.SCOPE_GLOBAL);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMPANY_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMMON_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_FD_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMMON_VIEW);
+
+	            return ApplicationConstants.ERR_MSG_SESSION_TERMINTATED;
+	        }else{
+	        	return "";
+	        }
+		}catch (Exception e) {
+			return "Error in checking session terminated";	
+		}
+	}
+	
+	@RequestMapping(value = { "/company" })
 	public ModelAndView loginPage(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		HttpURLConnection conn = null;
 		URL url;
@@ -123,8 +155,7 @@ public class CompanyEmployeeAuthenticate {
                 
                 if(!response.equalsIgnoreCase(ApplicationConstants.LOGIN_SUCCESS)){
                 	System.out.println("MESSAGE | LOGGIN FAIL.");
-                	req.setAttribute("errMsg", response);            	
-                	return new ModelAndView("main/login");
+                	throw new Exception(response);
                 }		
                 System.out.println("MESSAGE | LOGGIN SUCCESS.");
                 //getting logged user details from company service.	---------------------------------------------
@@ -163,9 +194,6 @@ public class CompanyEmployeeAuthenticate {
                 CompanyUserModel model = dfumsMap.get(userData.getUSER_ID());                
                 userData.setBase64Image(model!=null?model.getBase64Image():"");
                 userData.setUSER_TYPE(ApplicationConstants.BANK_EMPLOYEE);
-                
-                return new ModelAndView("main/home");
-                //System.out.println("MESSAGE | is upateReference table : " + userReferenceLogic.upateReferenceByUserId(userData));
             }else{
                 FdUserModel dfum = fdUserLogic.getFdUserByUserName(Arrays.asList(userName));
                 if (dfum == null) {
@@ -177,7 +205,7 @@ public class CompanyEmployeeAuthenticate {
                     processLogoff(session, req, objManager);
                     
                     
-                  //System.out.println(fdUserLogic.test());			
+                    //System.out.println(fdUserLogic.test());			
         			serviceUrl = ApplicationConstants.LOGGIN_NON_COMPANY_USER + "/" + userName + "/" +password;
                     System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
                     url = new URL(serviceUrl);
@@ -198,9 +226,13 @@ public class CompanyEmployeeAuthenticate {
                     }
                     
                     if(!response.equalsIgnoreCase(ApplicationConstants.LOGIN_SUCCESS)){
-                    	System.out.println("MESSAGE | LOGGIN FAIL.");
-                    	req.setAttribute("errMsg", response);            	
-                    	return new ModelAndView("main/login");
+                    	System.out.println("MESSAGE | LOGGIN FAIL.");    
+                    	if(response.equalsIgnoreCase(ApplicationConstants.LOCK_USER)){
+                    		dfum.setSecurepassUserStatus(ApplicationConstants.LOCK_USER);
+                    		fdUserLogic.updateFdUserPasswordLock(dfum);
+                    	}
+                    	
+                    	throw new Exception(response);
                     }
                     
                     System.out.println("MESSAGE | Login Successful");
@@ -210,33 +242,75 @@ public class CompanyEmployeeAuthenticate {
                     userData.setUSER_ID(dfum.getFdUserMasterId()+"");
                     userData.setUSER_NAME(dfum.getFdUserName());
                     userData.setFIRST_NAME(dfum.getFdUserFirstName());
-                    userData.setLAST_NAME(dfum.getFdUserLastName());
+                    userData.setLAST_NAME(dfum.getFdUserLastName());                  
                     
-                    
-                    System.out.println("MESSAGE | successfully login.");
-                    //System.out.println("MESSAGE | is upateReference table : " + userReferenceLogic.upateReferenceByUserId(userData));
-                    
-                    System.out.println("MESSAGE | LOGGIN SUCCESS.");
-        			return new ModelAndView("main/home");
-                    
-                } else if (dfum.getSecurepassUserStatus().equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_REGISTER)) {//going to set password
+                }else if (dfum.getSecurepassUserStatus().equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_REGISTER) || dfum.getSecurepassUserStatus().equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD_AUTH)) {//going to set password
                     System.out.println("MESSAGE | ReDirect to password setup.");
+                    eventLogger.doLog(req, userData.getAD_USER_ID(), ApplicationConstants.EVENT_LOG_LOGIN, "PASSWORDSET", "password set Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
         			return new ModelAndView("main/login");
                 }
-                return new ModelAndView("main/login");
-            }			
+            }	
+            
+            System.out.println("MESSAGE | successfully login.");
+            System.out.println("MESSAGE | is upateReference table : " + userReferenceLogic.upateReferenceByUserId(userData)); 
+            objManager.put("userData",userData,ApplicationConstants.SCOPE_GLOBAL);
+            eventLogger.doLog(req, userData.getAD_USER_ID(), ApplicationConstants.EVENT_LOG_LOGIN, "LOGIN", "Login Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
+			return new ModelAndView("main/home");
 
 		}catch (SBLException ex) {
+			eventLogger.doLog(req, userData!=null?userData.getAD_USER_ID():"", ApplicationConstants.EVENT_LOG_LOGIN, "LOGIN", "Login Fail", "", "", ApplicationConstants.EVENTFAIL);
 			System.out.println("ERROR | Error Occured." + ex.getMessage());
-			//throw new SBLException("Unable to fetch data.");
+			req.setAttribute("errMsg", ex.getMessage());
 			return new ModelAndView("main/login");
 		}catch (Exception ex) {
+			eventLogger.doLog(req, userData!=null?userData.getAD_USER_ID():"", ApplicationConstants.EVENT_LOG_LOGIN, "LOGIN", "Login Fail", "", "", ApplicationConstants.EVENTFAIL);
 			System.out.println("ERROR | Error Occured." + ex.getMessage());
-			//throw new SBLException("Unable to fetch data.");
+			req.setAttribute("errMsg", ex.getMessage());
 			return new ModelAndView("main/login");
 		}
 
 	}
+	
+	
+	
+	
+	@RequestMapping(value = { "/authonticate/SetPassword" })
+	public ModelAndView setPassword(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+		System.out.println("ENTERED | EmployeeLoginAction.userLogout()");
+		ModelAndView mv = null;
+		ObjectManager objManager = null;
+		UserData userData;
+		String userName = "", password = "", confirmPassword = "";
+        try {
+        	System.out.println("MESSAGE | Front Desk User Password Resetting.");
+
+            userName = req.getParameter("txtUserId").trim();
+            password = req.getParameter("txtPassword").trim();
+            confirmPassword = req.getParameter("txtConformPassword").trim();
+
+            if (!APPUtills.isThisStringValid(userName) || !APPUtills.isThisStringValid(password)) {
+                throw new SBLException("Username and Password cannot be empty.");
+            } else if (!password.equalsIgnoreCase(confirmPassword)) {
+                throw new SBLException("Passwords are not match.");
+            }
+            if (fdUserLogic.setPasswordDEDirectryUser(userName, password)) {
+                //If success
+                objManager.remove("isPswdReset");
+                System.out.println("MESSAGE | New password successfull save.");
+            }
+			
+        } catch (Exception ex) {
+        	eventLogger.doLog(req, "", ApplicationConstants.EVENT_LOG_LOGIN, "LOGOFF", "Logoff fail", "", "", ApplicationConstants.EVENTFAIL);
+        	req.setAttribute("errMsg", ex.getMessage());
+        }
+		System.out.println("LEFT | EmployeeLoginAction.userLogout()");
+		return new ModelAndView("main/login");	
+	}
+	
+	
+	
+	
+	
 	private void processLogoff(HttpSession session, HttpServletRequest req, ObjectManager objManager) throws Exception, SBLException {
         System.out.println("ENTERED | EmployeeLoginAction.processLogoff()");
         try {
@@ -244,12 +318,10 @@ public class CompanyEmployeeAuthenticate {
             // Get the login user
             objManager.remove("userData");
             objManager.cleanup();
-            //eventLogger.doLog(req, userData.getAD_USER_ID(), ApplicationConstants.EVENT_LOG_LOGIN, "LOGOFF", "Logoff Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             throw new SBLException("Logoff process failed");
         }
-
         System.out.println("LEFT    | EmployeeLoginAction.processLogoff()");
     }
 	
@@ -258,16 +330,23 @@ public class CompanyEmployeeAuthenticate {
 		System.out.println("ENTERED | EmployeeLoginAction.userLogout()");
 		ModelAndView mv = null;
 		ObjectManager objManager = null;
+		UserData userData;
 		try {
+			userData = (UserData) objManager.get("userData");
 			objManager = new ObjectManager(session);
-			processLogoff(session, req, objManager);            
+			processLogoff(session, req, objManager);   
+			if(userData == null){
+				eventLogger.doLog(req, "", ApplicationConstants.EVENT_LOG_LOGIN, "LOGOFF", "Logoff Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
+			}else{
+				eventLogger.doLog(req, userData.getAD_USER_ID(), ApplicationConstants.EVENT_LOG_LOGIN, "LOGOFF", "Logoff Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
+			}
+			
         } catch (Exception ex) {
-            //System.out.println("ERROR   | Unable to fetch list of object from temp table." + ex.getMessage(), ex);
-            //throw new SBLException("Unable to fetch data.");
+        	eventLogger.doLog(req, "", ApplicationConstants.EVENT_LOG_LOGIN, "LOGOFF", "Logoff fail", "", "", ApplicationConstants.EVENTFAIL);
+        	req.setAttribute("errMsg", ex.getMessage());
         }
 		System.out.println("LEFT | EmployeeLoginAction.userLogout()");
-		return new ModelAndView("main/login");
-		
+		return new ModelAndView("main/login");	
 	}
 	
 	

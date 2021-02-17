@@ -3,6 +3,10 @@
     Created on : Dec 21, 2020, 3:35:15 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -10,19 +14,21 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="com.company.models.FdUserModel"%>
 <%@page import="com.company.common.ApplicationConstants"%>
+
 <%@ include file="../includes/include-initial-variables.jsp"%>
 <%@ include file="../includes/include-notifications.jsp"%> 
+
 <%
     Map<Integer, FdUserModel> dfumsMap = objManager.get("frontDeskUsers") != null ? (Map<Integer, FdUserModel>) objManager.get("frontDeskUsers") : new HashMap();
     List<FdUserModel> objList = new ArrayList<>(dfumsMap.values());
 %>
 <div>
     <ul class="nav nav-tabs"> 
-        <li>
-            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>'/FrontDeskUser/ExistingFrontDeskUsers)"><b><i>Existing</i></b></a>
-        </li>
         <li class="active">
-            <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>'/FrontDeskUser.PendingFrontDeskUsers)"><b><i>Pending</i></b></a>
+            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CommonEntererAuth/ExistingCommonEntererAuths')"><b><i>Existing</i></b></a>
+        </li>
+        <li>
+            <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CommonEntererAuth/PendingCommonEntererAuths')"><b><i>Pending</i></b></a>
         </li>
     </ul>
 </div>
@@ -139,7 +145,7 @@
             "dom": '<lf<t>ip>',
             //"lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]]
         });
-        $(".titleLink").css('background', '#ff751a');
-        $("#fdUsr").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#cmnUsr").css('background', '#006080');
     });
 </script>

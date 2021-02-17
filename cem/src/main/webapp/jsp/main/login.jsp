@@ -82,7 +82,7 @@
 
                     <div style="background-color: #ffffff">
                         <%if (!isPswdReset) {%>
-                        <form class="panel-body" action="<%=sURLPrefix%>/authonticate/UserLogin" method="post">
+                        <form class="panel-body" action="<%=sURLPrefix%>/company" method="post">
                             <hr>
                             <div class="custom-control custom-switch">
                                 <input type="checkbox" name="cBoxuserType" checked="true">

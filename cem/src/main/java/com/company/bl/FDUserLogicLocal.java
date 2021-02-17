@@ -23,4 +23,12 @@ public interface FDUserLogicLocal {
 	public boolean deleteFdUser(FdUserModel fdUserModel) throws Exception;
 
 	public boolean verifyUser(FdUserModel fdUserModel, UserData userData, boolean isSecurepassProcess) throws Exception;
+	
+	public boolean saveFdUserResetPassword(FdUserModel fdUserModel, UserData userData) throws Exception;
+	
+	public boolean verifyFdUserResetPassword(FdUserModel fdUserModel, UserData userData) throws Exception;
+	
+	public boolean setPasswordDEDirectryUser(String userName, String userPassword) throws SBLException;
+	
+	public boolean updateFdUserPasswordLock(FdUserModel fdUserModel) throws Exception;
 }

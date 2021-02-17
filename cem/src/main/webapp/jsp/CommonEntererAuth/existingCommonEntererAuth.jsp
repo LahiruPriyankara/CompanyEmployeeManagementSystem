@@ -3,12 +3,18 @@
     Created on : Dec 21, 2020, 3:35:15 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
+
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="com.company.models.FdUserModel"%>
 <%@page import="com.company.common.ApplicationConstants"%>
+
 <%@ include file="../includes/include-initial-variables.jsp"%>
 <%@ include file="../includes/include-notifications.jsp"%>  
 <style> 
@@ -25,13 +31,14 @@
 <div>
     <ul class="nav nav-tabs"> 
         <li class="active">
-            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>'/FrontDeskUser/ExistingFrontDeskUsers)"><b><i>Existing</i></b></a>
+            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CommonEntererAuth/ExistingCommonEntererAuths')"><b><i>Existing</i></b></a>
         </li>
         <li>
-            <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUsers')"><b><i>Pending</i></b></a>
+            <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CommonEntererAuth/PendingCommonEntererAuths')"><b><i>Pending</i></b></a>
         </li>
     </ul>
 </div>
+
 <br>       
 <div class="row">
     <div class="col-sm-8 col-md-8"></div>
@@ -102,41 +109,9 @@
             "dom": '<lf<t>ip>',
             //"lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]]
         });
-        $(".titleLink").css('background', '#ff751a');
-        $("#cmnUsr").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#cmnUsr").css('background', '#006080');
 
     });
-
-    function clickOnCheckBox(val, clName) {
-        document.g
-        if (val.checked) {
-            $("." + clName + "").prop("readonly", false);
-        } else {
-            $("." + clName + "").prop("readonly", true);
-        }
-    }
-    var isNewRowExisting = false;
-    function addNewEmployee() {
-        if (!isNewRowExisting) {
-            $('#mainTable tr:first').after('<tr>\n\
-<td  style="text-align: right"><span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUser(\'\',\'<%=sURLPrefix + URLEncoderDecoder.encodeURL("Action.FrontDeskUser.SaveNewFrontDeskUser=&sSession=" + sSession)%>\')"></span></td>\n\
-<td>-<input type="hidden" class="fieldData" id="tempId" name="tempId" value="" readonly></td>\n\
-<td><input type="text" class="fieldData" id="userName" name="userName" value="" placeholder="USER NAME"></td>\n\
-<td><input type="text" class="fieldData" id="userFirstName" name="userFirstName" value="" placeholder="FIRST NAME"></td>\n\
-<td><input type="text" class="fieldData" id="userLastName" name="userLastName" value="" placeholder="LAST NAME"></td>\n\
-<td>-</td>\n\
-<td>\n\
-<select id="status" name="status" style="width: 40%;">\n\
-<option value="<%=ApplicationConstants.STATUS_ACTIVE%> selected="true">\n\
-    <%= ApplicationConstants.statusDesc(ApplicationConstants.STATUS_ACTIVE)%> \n\
-</option></select>\n\
-</td>\n\
-<td style="display: none">a</td>\n\
-</tr> ');
-            isNewRowExisting = true;
-        } else {
-            alert("Existing record must be saved.");
-        }
-    }
 
 </script>

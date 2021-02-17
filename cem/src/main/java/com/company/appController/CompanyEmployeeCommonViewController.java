@@ -36,11 +36,21 @@ public class CompanyEmployeeCommonViewController {
         Map<String, CompanyUserModel> dfumsMap = new HashMap();
         Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
         ObjectManager objManager = null;
+        UserData userData = null;
         try {
             /*
             Getting all active CEM users from master table.
              */
-            objManager.remove("bankEmployeesMap");
+        	objManager = new ObjectManager(session);
+            userData = (UserData) objManager.get("userData");
+            
+            String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	objManager.remove("compnayEmployeesMap");
+        	
             dfumsMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, null, "");
             List<CompanyUserModel> dfumsList = new ArrayList<>(dfumsMap.values());
             for (CompanyUserModel model : dfumsList) {
@@ -52,14 +62,14 @@ public class CompanyEmployeeCommonViewController {
             objManager.put("companyEmployeesMap", companyEmployeesMap, ApplicationConstants.SCOPE_COMMON_VIEW);
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("main/home");
+            req.setAttribute("errMsg", ex.getMessage());
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
-            //return new ModelAndView("main/home");
+            req.setAttribute("errMsg", ex.getMessage());
         }
 
         System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllEmployeeList()");
-        return new ModelAndView("CompanyEmployeeCommonViewController/comnViewBankEmployee");
+        return new ModelAndView("commonView/comnViewBankEmployee");
 		
 	}
 	
@@ -70,12 +80,21 @@ public class CompanyEmployeeCommonViewController {
         CompanyUserModel modelFromCOM_SERVICE = null;
         String id;
         ObjectManager objManager = null;
+        UserData userData = null;
         try {
             /*
             getting CEM record from objManager
             getting related COM_SERVICE record from COMPANY service (by passing solId)
              */
         	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	
             objManager.remove("modelFromCEM");
             objManager.remove("modelFromCOM_SERVICE");
 
@@ -98,14 +117,35 @@ public class CompanyEmployeeCommonViewController {
             
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             return new ModelAndView("commonView/comnViewBankEmployee");
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
             return new ModelAndView("commonView/comnViewBankEmployee");
         }
 
         System.out.println("LEFT    | CompanyEmployeeCommonViewController.getEmployeeDetailsForCommonView()");
         return new ModelAndView("commonView/comnViewBankEmployeeDetails");
+	}
+	
+	public String checkSessionTimeOut(UserData userData,ObjectManager objManager){
+		try{
+			if (userData == null) {
+	            objManager.remove("userType");
+	            objManager.cleanup(ApplicationConstants.SCOPE_GLOBAL);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMPANY_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMMON_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_FD_USER);
+	            objManager.cleanup(ApplicationConstants.SCOPE_COMMON_VIEW);
+
+	            return ApplicationConstants.ERR_MSG_SESSION_TERMINTATED;
+	        }else{
+	        	return "";
+	        }
+		}catch (Exception e) {
+			return "Error in checking session terminated";	
+		}
 	}
 	
 	

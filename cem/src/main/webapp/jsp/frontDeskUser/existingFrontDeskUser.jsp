@@ -3,6 +3,10 @@
     Created on : Dec 21, 2020, 3:35:15 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -26,7 +30,7 @@
 <div>
     <ul class="nav nav-tabs"> 
         <li class="active">
-            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>'/FrontDeskUser/ExistingFrontDeskUsers)"><b><i>Existing</i></b></a>
+            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/FrontDeskUser/ExistingFrontDeskUsers')"><b><i>Existing</i></b></a>
         </li>
         <li>
             <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUsers')"><b><i>Pending</i></b></a>
@@ -101,8 +105,8 @@
             "dom": '<lf<t>ip>',
             //"lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]]
         });
-        $(".titleLink").css('background', '#ff751a');
-        $("#fdUsr").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#fdUsr").css('background', '#006080');
 
     });
 
@@ -124,7 +128,7 @@
     function addNewEmployee() {
         if (!isNewRowExisting) {
             $('#mainTable tr:first').after('<tr>\n\
-<td  style="text-align: right"><span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUser(\'\',\'<%=sURLPrefix + URLEncoderDecoder.encodeURL("Action.FrontDeskUser.SaveNewFrontDeskUser=&sSession=" + sSession)%>\')"></span></td>\n\
+<td  style="text-align: right"><span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUser(\'\',\'<%=sURLPrefix%>/FrontDeskUser/SaveNewFrontDeskUser\')"></span></td>\n\
 <td>-<input type="hidden" class="fieldData" id="tempId" name="tempId" value="" readonly></td>\n\
 <td><input type="text" class="fieldData" id="userName" name="userName" value="" placeholder="USER NAME"></td>\n\
 <td><input type="text" class="fieldData" id="userFirstName" name="userFirstName" value="" placeholder="FIRST NAME"></td>\n\

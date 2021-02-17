@@ -3,6 +3,10 @@
     Created on : Dec 21, 2020, 3:35:15 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="com.company.models.DivInfo"%>
 <%@page import="java.util.ArrayList"%>
@@ -13,6 +17,7 @@
 <%@page import="com.company.common.ObjectManager"%>
 <%@page import="com.company.common.ApplicationConstants"%>
 <%@ include file="../includes/include-notifications.jsp"%>  
+
 <style> 
     input {
         width: 100px;
@@ -32,12 +37,12 @@
 <%
     ObjectManager objManager1 = new ObjectManager(session);
     String sSession1 = session.getId();
-    String sURLPrefix1 = request.getContextPath() + "/ActionController?";
+    String sURLPrefix1 = request.getContextPath();
 
-    Map<String, CompanyUserModel> ActiveUsers = objManager1.get("ActiveUsers") != null ? (HashMap) objManager1.get("ActiveUsers") : new HashMap();
-    Map<String, CompanyUserModel> InactiveUsers = objManager1.get("InactiveUsers") != null ? (HashMap) objManager1.get("InactiveUsers") : new HashMap();
-    Map<String, CompanyUserModel> UsersMisMatchWithUPM = objManager1.get("UsersMisMatchWithUPM") != null ? (HashMap) objManager1.get("UsersMisMatchWithUPM") : new HashMap();
-    Map<String, CompanyUserModel> NotAvailableUsers = objManager1.get("NotAvailableUsers") != null ? (HashMap) objManager1.get("NotAvailableUsers") : new HashMap();
+    Map<String, CompanyUserModel> ActiveUsers = objManager1.get("cemActiveUsers") != null ? (HashMap) objManager1.get("cemActiveUsers") : new HashMap();
+    Map<String, CompanyUserModel> InactiveUsers = objManager1.get("cemInactiveUsers") != null ? (HashMap) objManager1.get("cemInactiveUsers") : new HashMap();
+    Map<String, CompanyUserModel> UsersMisMatchWithUPM = objManager1.get("cemUsersMisMatchWithCOM_SERVICE") != null ? (HashMap) objManager1.get("cemUsersMisMatchWithCOM_SERVICE") : new HashMap();
+    Map<String, CompanyUserModel> NotAvailableUsers = objManager1.get("cemNotAvailableUsers") != null ? (HashMap) objManager1.get("cemNotAvailableUsers") : new HashMap();
     Map<String, DivInfo> divInfoMap = objManager1.get("divInfoMap") != null ? (HashMap) objManager1.get("divInfoMap") : new HashMap();
     String criteria = objManager1.get("criteria") != null ? (String) objManager1.get("criteria") : "";
 
@@ -166,7 +171,7 @@
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
                                     <img src="data:image/jpg;base64,<%=model.getBase64Image()%>" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%} else {%>
-                                    <img src="${pageContext.request.contextPath}/resourses/images/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
+                                    <img src="${images}/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%}%>
                                 </td>
                                 <td><%=APPUtills.getString(model.getCompanyUserEmpId())%></td>
@@ -248,8 +253,8 @@
     //var department = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Anguilla", "Antigua &amp; Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia &amp; Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central Arfrican Republic", "Chad", "Chile", "China", "Colombia", "Congo", "Cook Islands", "Costa Rica", "Cote D Ivoire", "Croatia", "Cuba", "Curacao", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Falkland Islands", "Faroe Islands", "Fiji", "Finland", "France", "French Polynesia", "French West Indies", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauro", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Pierre &amp; Miquelon", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "St Kitts &amp; Nevis", "St Lucia", "St Vincent", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor L'Este", "Togo", "Tonga", "Trinidad &amp; Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks &amp; Caicos", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Virgin Islands (US)", "Yemen", "Zambia", "Zimbabwe"];
 
     $(document).ready(function () {
-        $(".titleLink").css('background', '#ff751a');
-        $("#depEmp").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#depEmp").css('background', '#006080');
 
         $('#mainTable').DataTable({
             //"sPaginationType": "full_numbers",

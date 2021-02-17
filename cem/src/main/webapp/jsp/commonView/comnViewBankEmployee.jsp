@@ -3,6 +3,10 @@
     Created on : Dec 24, 2020, 8:31:24 AM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="com.company.common.ApplicationConstants"%>
 <%@page import="com.company.models.CompanyUserModel"%>
@@ -12,11 +16,12 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
+
 <%@ include file="../includes/include-initial-variables.jsp"%>
 <%@ include file="../includes/include-notifications.jsp"%>
 
 <%
-    Map<String, CompanyUserModel> dvmUsers = objManager.get("bankEmployeesMap") != null ? (HashMap) objManager.get("bankEmployeesMap") : new HashMap();
+    Map<String, CompanyUserModel> dvmUsers = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
     List<CompanyUserModel> dvmUsersList = new ArrayList<>(dvmUsers.values());
 %>
 
@@ -55,7 +60,7 @@
                                 <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
                                 <img src="data:image/jpg;base64,<%=model.getBase64Image()%>" style="border-radius: 50%;margin-right: 2px" alt="pro pic" width="25" height="25"/>
                                 <%} else {%>
-                                <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="pro pic" width="25" height="25"/>
+                                <img src="${images}/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="pro pic" width="25" height="25"/>
                                 <%}%>                                
                             </td>
                             <td><%=APPUtills.getString(model.getCompanyUserEmpId())%></td>
@@ -97,7 +102,7 @@
             "dom": '<lf<t>ip>',
             "lengthMenu": [[15, 50, 100, -1], [15, 50, 100, "All"]]
         });
-        $(".titleLink").css('background', '#ff751a');
-        $("#allEmployee").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#allEmployee").css('background', '#006080');
     });
 </script>

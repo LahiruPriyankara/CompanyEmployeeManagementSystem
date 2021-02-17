@@ -18,7 +18,7 @@ public class ApplicationConstants {
 
     // Session Scpe Parameters
     public final static int SCOPE_GLOBAL = 0;
-    public final static int SCOPE_BANK_USER = 1;
+    public final static int SCOPE_COMPANY_USER = 1;
     public final static int SCOPE_FD_USER = 2;
     public final static int SCOPE_COMMON_USER = 3;
     public final static int SCOPE_COMMON_VIEW = 4;
@@ -105,9 +105,16 @@ public class ApplicationConstants {
     public final static String SECUREPASS_USER_REGISTER = "REGISTER";
     public final static String SECUREPASS_USER_AUTHORIZE = "AUTHORIZE";
     public final static String SECUREPASS_USER_SET_PASSWORD = "SET_PASS";
+    public final static String SECUREPASS_USER_SET_PASSWORD_AUTH = "SET_PASS_AUTH";
     public final static String SECUREPASS_USER_ACTIVE = "ACTIVE";
     public final static String SECUREPASS_USER_RESET_PASSWORD = "RESET_PASS";
     public final static String SECUREPASS_USER_LOCK = "LOCK";
+    
+    //FOR GET SEQUENCE NUMBER
+    public final static int COMPANY_USER_MASTER_ID = 1;
+    public final static int COMPANY_USER_TMP_ID = 2;
+    public final static int FD_USER_MASTER_ID = 3;
+    public final static int FD_USER_TMP_ID = 4;
 
     public static List<String> USER_GRADES = new ArrayList<>();
     public final static List<String> USER_GENDER = Arrays.asList(new String[]{"M", "F"});

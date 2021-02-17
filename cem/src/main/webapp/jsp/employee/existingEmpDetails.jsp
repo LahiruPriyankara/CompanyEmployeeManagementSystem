@@ -3,6 +3,9 @@
     Created on : Dec 22, 2020, 11:09:18 AM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
 
 <%@page import="com.company.models.CompanyUserModel"%>
 <%@page import="com.company.common.ApplicationConstants"%>
@@ -70,8 +73,8 @@
 </style>
 
 <%
-    CompanyUserModel DVMmodelMaster = objManager.get("DVMmodelMaster") != null ? (CompanyUserModel) objManager.get("DVMmodelMaster") : new CompanyUserModel();
-    CompanyUserModel UPMmodel = objManager.get("UPMmodel") != null ? (CompanyUserModel) objManager.get("UPMmodel") : new CompanyUserModel();
+    CompanyUserModel DVMmodelMaster = objManager.get("CEMmodelMaster") != null ? (CompanyUserModel) objManager.get("CEMmodelMaster") : new CompanyUserModel();
+    CompanyUserModel UPMmodel = objManager.get("COM_SERVICEmodel") != null ? (CompanyUserModel) objManager.get("COM_SERVICEmodel") : new CompanyUserModel();
 
     List<String> grades = ApplicationConstants.USER_GRADES;
     List<String> gender = ApplicationConstants.USER_GENDER;
@@ -81,12 +84,12 @@
     <%if (APPUtills.isThisStringValid(DVMmodelMaster.getBase64Image())) {%>
     <img src="data:image/png;base64,<%=DVMmodelMaster.getBase64Image()%>" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
     <%} else {%>
-    <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
+    <img src="${images}/userDefault.jpg" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
     <%}%>
 </div>
 <hr>
 
-<form id="bankUserDetails" method="post" class="form-horizontal" action="<%= sURLPrefix%>/CompanyEmployee/SaveCompanyEmp" enctype="multipart/form-data">
+<form id="bankUserDetails" method="post" class="form-horizontal" action="<%= sURLPrefix%>/CompanyEmployee/SaveSingleEmp" enctype="multipart/form-data">
     <div class="row">
         <div class="col-sm-3 col-md-3">
             <label style="color: #ccc;"><i>basic info</i></label>

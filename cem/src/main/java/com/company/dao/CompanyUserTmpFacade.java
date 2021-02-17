@@ -77,7 +77,7 @@ public class CompanyUserTmpFacade implements CompanyUserTmpFacadeLocal {
             }
 
             recStatusList = Arrays.asList(ApplicationConstants.RECORD_STATUS_PENDING, ApplicationConstants.RECORD_STATUS_REJECT);
-            query.setParameter("recStatus", recStatusList);
+            query.setParameterList("recStatus", recStatusList);
             System.out.println("JQL     | " + query.toString());
             dfumsList = query.list();
             tx.commit();

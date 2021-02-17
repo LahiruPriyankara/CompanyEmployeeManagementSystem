@@ -3,6 +3,11 @@
     Created on : Dec 21, 2020, 3:35:15 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
+
+
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -39,9 +44,9 @@
     // ObjectManager objManager1 = new ObjectManager(session);
     //String sSession1 = session.getId();
     // String sURLPrefix1 = request.getContextPath() + "/ActionController?";
-    Map<Integer, CompanyUserModel> dvmUsersMatchWithUPM = objManager.get("dvmUsersMatchWithUPM") != null ? (Map<Integer, CompanyUserModel>) objManager.get("dvmUsersMatchWithUPM") : new HashMap();
+    Map<Integer, CompanyUserModel> dvmUsersMatchWithUPM = objManager.get("cemUsersMatchWithCOM_SERVICE") != null ? (Map<Integer, CompanyUserModel>) objManager.get("cemUsersMatchWithCOM_SERVICE") : new HashMap();
     List<CompanyUserModel> dvmUsersMatchWithUPMList = new ArrayList<>(dvmUsersMatchWithUPM.values());
-    Map<String, CompanyUserModel> dvmUsersMisMatchWithUPM = objManager.get("dvmUsersMisMatchWithUPM") != null ? (HashMap) objManager.get("dvmUsersMisMatchWithUPM") : new HashMap();
+    Map<String, CompanyUserModel> dvmUsersMisMatchWithUPM = objManager.get("cemUsersMisMatchWithCOM_SERVICE") != null ? (HashMap) objManager.get("cemUsersMisMatchWithCOM_SERVICE") : new HashMap();
     List<CompanyUserModel> dvmUsersMisMatchWithUPMList = new ArrayList<>(dvmUsersMisMatchWithUPM.values());
 
     List<String> grades = ApplicationConstants.USER_GRADES;
@@ -117,7 +122,7 @@
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
                                     <img src="data:image/jpg;base64,<%=model.getBase64Image()%>" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%} else {%>
-                                    <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
+                                    <img src="${images}/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%}%>
                                 </td>
                                 <td><%=APPUtills.getString(model.getCompanyUserEmpId())%></td>
@@ -159,7 +164,7 @@
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
                                     <img src="data:image/jpg;base64,<%=model.getBase64Image()%>" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%} else {%>
-                                    <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
+                                    <img src="${images}/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%}%>
                                 </td>
                                 <td><%=APPUtills.getString(model.getCompanyUserEmpId())%></td>
@@ -226,7 +231,7 @@
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
                                     <img src="data:image/jpg;base64,<%=model.getBase64Image()%>" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%} else {%>
-                                    <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
+                                    <img src="${images}/userDefault.jpg" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>
                                     <%}%>
                                 </td>
                                 <td><%=APPUtills.getString(model.getCompanyUserEmpId())%></td>
@@ -297,8 +302,8 @@
 <br>
 <script>
     $(document).ready(function () {
-        $(".titleLink").css('background', '#ff751a');
-        $("#depEmp").css('background', '#cc5200');
+        $(".titleLink").css('background', '#1a8cff');
+        $("#depEmp").css('background', '#006080');
 
         $('#mainTable').DataTable({
             //"sPaginationType": "full_numbers",

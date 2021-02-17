@@ -61,10 +61,10 @@ public class UserReferenceFacade implements UserReferenceFacadeLocal {
         	if(dur == null){
         		throw new SBLException("Please sSent a vlid event log object to save.");
         		}
-            
+        	System.out.println("LEFT    | dur.toString() : "+dur.toString());
             session = DbConfig.sessionBulder();  
             tx = session.beginTransaction();
-            if(dur.getUserId()==0){
+            if(dur.getReferenceId()==0){
             	session.save(dur);
             }else{
             	session.update(dur);

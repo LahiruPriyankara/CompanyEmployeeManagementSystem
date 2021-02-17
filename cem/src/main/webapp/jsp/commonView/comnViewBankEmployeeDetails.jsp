@@ -3,12 +3,16 @@
     Created on : Jan 27, 2021, 4:51:22 PM
     Author     : sits_lahirupr
 --%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:url var="images" value="/resources/images"/>
 
 <%@page import="com.company.common.APPUtills"%>
 <%@page import="com.company.common.ApplicationConstants"%>
 <%@page import="com.company.models.CompanyUserModel"%>
 <%@ include file="../includes/include-initial-variables.jsp"%>
 <%@ include file="../includes/include-notifications.jsp"%>  
+
 <style> 
     #detailsTable td {   
         padding-top: 5px;
@@ -20,8 +24,8 @@
     }
 </style>
 <%
-    CompanyUserModel modelFromDVM = objManager.get("modelFromDVM") != null ? (CompanyUserModel) objManager.get("modelFromDVM") : new CompanyUserModel();
-    CompanyUserModel modelFromUPM = objManager.get("modelFromUPM") != null ? (CompanyUserModel) objManager.get("modelFromUPM") : new CompanyUserModel();
+    CompanyUserModel modelFromDVM = objManager.get("modelFromCEM") != null ? (CompanyUserModel) objManager.get("modelFromCEM") : new CompanyUserModel();
+    CompanyUserModel modelFromUPM = objManager.get("modelFromCOM_SERVICE") != null ? (CompanyUserModel) objManager.get("modelFromCOM_SERVICE") : new CompanyUserModel();
     //System.out.println("modelFromDVM.getBase64Image() : "+modelFromDVM.getBase64Image());
 %>
 
@@ -30,7 +34,7 @@
     <%if (APPUtills.isThisStringValid(modelFromDVM.getBase64Image())) {%>
     <img src="data:image/png;base64,<%=modelFromDVM.getBase64Image()%>" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
     <%} else {%>
-    <img src="${pageContext.request.contextPath}/ui/images/userDefault.jpg" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
+    <img src="${images}/userDefault.jpg" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
     <%}%>
 
 </div>

@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -24,23 +26,26 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author sits_lahirupr
  */
 @Entity
-@Table(name = "CUD_USER_REFERENCE")
+@Table(name = "CUD_USER_REFERENCE_TBL")
 public class UserReference implements Serializable {
 
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
-    @Basic(optional = false)
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "REFERENCE_ID")
     private int referenceId;
+    
     @Column(name = "USER_ID")
     private int userId;
+    
     @Column(name = "LOGGING_COUNT")
-    private Integer loggingCount;
+    private int loggingCount;
+    
     @Column(name = "FIRST_LOGIN_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date firstLoginDate;
+    
     @Column(name = "LAST_LOGIN_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastLoginDate;
@@ -68,11 +73,11 @@ public class UserReference implements Serializable {
         this.userId = userId;
     }
 
-    public Integer getLoggingCount() {
+    public int getLoggingCount() {
         return loggingCount;
     }
 
-    public void setLoggingCount(Integer loggingCount) {
+    public void setLoggingCount(int loggingCount) {
         this.loggingCount = loggingCount;
     }
 
