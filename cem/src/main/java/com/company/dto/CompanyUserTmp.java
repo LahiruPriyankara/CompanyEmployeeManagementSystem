@@ -39,7 +39,7 @@ public class CompanyUserTmp implements Serializable {
 	private int companyUserTmpId;
 	@Column(name = "COMPANY_USER_MASTER_ID")
 	private int companyUserMasterId;
-	@Size(max = 6)
+	@Size(max = 30)
 	@Column(name = "COMPANY_USER_EMP_ID")
 	private String companyUserEmpId;
 	@Lob

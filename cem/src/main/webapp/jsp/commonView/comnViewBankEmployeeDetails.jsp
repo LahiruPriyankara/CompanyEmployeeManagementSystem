@@ -29,7 +29,7 @@
     //System.out.println("modelFromDVM.getBase64Image() : "+modelFromDVM.getBase64Image());
 %>
 
-<div style="text-align: center;background-image: url('${pageContext.request.contextPath}/ui/images/deailsBackGround.JPG');">
+<div style="text-align: center;background-image: url('${images}/deailsBackGround.JPG');">
     
     <%if (APPUtills.isThisStringValid(modelFromDVM.getBase64Image())) {%>
     <img src="data:image/png;base64,<%=modelFromDVM.getBase64Image()%>" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>

@@ -22,6 +22,7 @@ import com.company.models.FdUserModel;
 import com.company.common.SBLException;
 import com.company.dbconfig.DbConfig;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -34,6 +35,10 @@ public class FDUserTmpFacade implements FDUserTmpFacadeLocal {
 	Transaction tx;
 	private static Logger log = LogManager.getLogger(FDUserTmpFacade.class);
 
+	@Autowired
+	SeqNumberGeneratorFacadeLocal seqNumberGeneratorFacade;
+	
+	
 	@Override
 	public Map<Integer, FdUserModel> getTempFdUsers(List<Integer> ids, String tableType) throws Exception {
 		System.out.println("ENTERED | DedFDUserTmpFacade.getTempFdUsers()");
@@ -65,10 +70,8 @@ public class FDUserTmpFacade implements FDUserTmpFacadeLocal {
 				if (ids.isEmpty()) {
 					throw new SBLException("Recived Empty userId.");
 				} else {
-					recStatusList = Arrays.asList(ApplicationConstants.RECORD_STATUS_PENDING,
-							ApplicationConstants.RECORD_STATUS_REJECT);
-					query = session.createQuery(
-							"FROM FdUserTmp tmp WHERE tmp.fdUserMasterId IN :fdUserMasterIds AND tmp.recStatus IN :recStatus");
+					recStatusList = Arrays.asList(ApplicationConstants.RECORD_STATUS_PENDING,ApplicationConstants.RECORD_STATUS_REJECT);
+					query = session.createQuery("FROM FdUserTmp tmp WHERE tmp.fdUserMasterId IN :fdUserMasterIds AND tmp.recStatus IN :recStatus");
 					query.setParameterList("fdUserMasterIds", ids);
 					query.setParameterList("recStatus", recStatusList);
 				}
@@ -114,13 +117,15 @@ public class FDUserTmpFacade implements FDUserTmpFacadeLocal {
 	@Override
 	public boolean modifyUser(FdUserModel model, int actionType) {
 
-		log.debug("Enter | modifyVehicle");
+		System.out.println("Enter | modifyUser TEMP TBL");
 		try {
+			System.out.println("actionType : "+actionType);
 			FdUserTmp temp =  (FdUserTmp) model.modelToObject(ApplicationConstants.TEMP_DATA);
 			session = DbConfig.sessionBulder();
 			tx = session.beginTransaction();
-
+			System.out.println("master.toString() : "+temp.toString());
 			if (actionType == 1) {
+				temp.setFdUserTmpId(seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.FD_USER_TMP_ID));
 				session.save(temp);
 			} else if (actionType == 2) {
 				session.update(temp);
@@ -131,13 +136,13 @@ public class FDUserTmpFacade implements FDUserTmpFacadeLocal {
 			}
 
 			tx.commit();
-			log.debug("persist successful");
+			System.out.println("persist successful");
 			return true;
 		} catch (Exception e) {
 			log.error("persist failed", e);
 			return false;
 		} finally {
-			log.debug("Left | modifyVehicle");
+			log.debug("Left | modifyUser");
 			if (session != null)
 				session.close();
 		}

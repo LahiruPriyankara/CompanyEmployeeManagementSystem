@@ -5,11 +5,11 @@
 --%>
 
 <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog" style="box-shadow: 0 0 10px 8px #331400;">
+    <div class="modal-dialog" style="box-shadow: 0 0 10px 8px #000000;">
 
         <!-- Modal content-->
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #331400;">
+            <div class="modal-header" style="background-color: #000000;">
                 <div style="float: left;"><span class="modal-title" style="color: #FFFFFF"><b>SELECTED USER DETAILS</b></span> </div>
                 <button type="button" class="close" data-dismiss="modal" style="color: #FFFFFF;"><span >&times;</span></button>                           
             </div>

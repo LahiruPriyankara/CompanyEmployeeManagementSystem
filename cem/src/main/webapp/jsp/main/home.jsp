@@ -22,7 +22,9 @@
         <!-- Initial variables --> 
         <%@ include file="../includes/include-initial-variables.jsp"%>
     </head>
-    <%        String userType = objManager.get("userType") != null ? (String) objManager.get("userType") : "";
+    <%        
+    String userType = objManager.get("userType") != null ? (String) objManager.get("userType") : "";
+    objManager.remove("userType");
     %>
     <body>
         <button type="button" id="btnForModel" data-toggle="modal" data-target="#myModal" hidden="true">Open Modal</button>
@@ -48,7 +50,7 @@
                             <span class="glyphicon glyphicon-user"></span>                             
                             User : <%=userData.getFIRST_NAME() + " " + userData.getLAST_NAME()%> | 
                             <%if (userData.getUSER_TYPE().equalsIgnoreCase(ApplicationConstants.BANK_EMPLOYEE)) {%>
-                            &nbsp;&nbsp;Emp ID : <%=userData.getUSER_ID()%> - <%=userData.getAD_USER_ID()%> |
+                            &nbsp;&nbsp;Emp ID : <%=userData.getUSER_ID()%> - <%=userData.getAD_USER_ID()%> |  DEPARTMENT ID : <%=userData.getDIV_CODE()%> |
                             <%} else {%>
                             &nbsp;&nbsp;Emp ID : <%=userData.getUSER_NAME()%> |
                             <%}%>

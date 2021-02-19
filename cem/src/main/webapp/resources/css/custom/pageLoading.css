@@ -41,7 +41,8 @@ and open the template in the editor.
 #loaderText {
     position: absolute;
     left: 50%;
-    top: 55%;
+    top: 45%;
+    /*top: 55%;*/
     z-index: 1;
     margin: -75px 0 0 -75px;
     color:#ffffff;

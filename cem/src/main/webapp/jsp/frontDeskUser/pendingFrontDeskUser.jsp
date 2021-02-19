@@ -81,7 +81,7 @@
                         <%} else if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT) && model.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_NEW)) {%>
                         <tr style="color: #ff704d">
                             <td style="text-align: right">
-                                <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>'/FrontDeskUser/PendingFrontDeskUserDetails)"></span>
+                                <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUserDetails')"></span>
                                 <span class="glyphicon glyphicon-trash removeIcon" style="color: #e62e00;" onclick="removeChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/RemoveFrontDeskUser')"></span>
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUser('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix %>/FrontDeskUser/SaveReModifiedFrontDeskUser')"></span>
                             </td>
@@ -101,7 +101,7 @@
                                 <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)) {%>
                                 <span class="glyphicon glyphicon-trash removeIcon" style="color: #e62e00;" onclick="removeChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/RemoveFrontDeskUser')"></span>
                                 <%} else {%>
-                                <span class="glyphicon glyphicon-remove cancelIcon" style="color: #800000;" onclick="rejectChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>'/FrontDeskUser/RejectFrontDeskUser)"></span>
+                                <span class="glyphicon glyphicon-remove cancelIcon" style="color: #800000;" onclick="rejectChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/RejectFrontDeskUser')"></span>
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/VerifyFrontDeskUser')"></span>
                                 <%}%>
                             </td>

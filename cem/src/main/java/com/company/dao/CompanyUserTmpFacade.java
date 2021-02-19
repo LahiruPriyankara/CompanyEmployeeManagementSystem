@@ -23,6 +23,7 @@ import com.company.models.CompanyUserModel;
 import com.company.common.SBLException;
 import com.company.dbconfig.DbConfig;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.company.models.UserData;
@@ -37,8 +38,8 @@ public class CompanyUserTmpFacade implements CompanyUserTmpFacadeLocal {
 	Transaction tx;
     private static Logger Log = LogManager.getLogger(CompanyUserTmpFacade.class);
 
-    //@Autowired
-    //private SeqNumberGeneratorBeanLocal seqNumberGeneratorBean;
+    @Autowired
+	SeqNumberGeneratorFacadeLocal seqNumberGeneratorFacade;
 
 
     @Override
@@ -115,6 +116,7 @@ public class CompanyUserTmpFacade implements CompanyUserTmpFacadeLocal {
     public boolean saveEmp(List<CompanyUserModel> CompanyUserModelList, UserData userData) throws Exception {
         System.out.println("ENTERED | CompanyUserTmpFacade.saveEmp()");
         boolean isSuccess = false;
+        int id = 0;
         try {
         	session = DbConfig.sessionBulder();  
             tx = session.beginTransaction();
@@ -123,21 +125,27 @@ public class CompanyUserTmpFacade implements CompanyUserTmpFacadeLocal {
                 CompanyUserModel.setModifiedBy(Integer.parseInt(userData.getUSER_ID()));
                 CompanyUserModel.setModifiedDate(APPUtills.getCurrentDate());
                 CompanyUserModel.setRecStatus(ApplicationConstants.RECORD_STATUS_PENDING);
-
+         
                 if (CompanyUserModel.getCompanyUserTmpId() == 0) {
-                    //CompanyUserModel.setCompanyUserTmpId(seqNumberGeneratorBean.getNextCompanyUserTempId());
+                	if(id == 0){
+                		id = seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.COMPANY_USER_TMP_ID);
+                	}else{
+                		id++;
+                	}
+                    CompanyUserModel.setCompanyUserTmpId(id);
                     CompanyUserModel.setCreatedBy(Integer.parseInt(userData.getUSER_ID()));
                     CompanyUserModel.setCreatedDate(APPUtills.getCurrentDate());
                     System.out.println("MESSAGE | CREATE "+CompanyUserModel.toString());
                     session.save((CompanyUserTmp) CompanyUserModel.modelToObject(ApplicationConstants.TEMP_DATA));
-                    tx.commit();
+                    
                 } else {
                     System.out.println("MESSAGE | MODIFY "+CompanyUserModel.toString());
                     session.update((CompanyUserTmp) CompanyUserModel.modelToObject(ApplicationConstants.TEMP_DATA));
-                    tx.commit();
+                    
                 }
 
             }
+            tx.commit();
             isSuccess = true;
         } catch (Exception ex) {
             //context.setRollbackOnly();

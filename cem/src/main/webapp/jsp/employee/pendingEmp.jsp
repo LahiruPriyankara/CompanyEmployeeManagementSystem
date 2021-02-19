@@ -60,10 +60,10 @@
 <div>
     <ul class="nav nav-tabs"> 
         <li>
-            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CompanyEmployee/ExistingEmp')"><b><i>Existing</i></b></a>
+            <a id="existingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CompanyDepEmployee/ExistingEmp')"><b><i>Existing</i></b></a>
         </li>
         <li class="active">
-            <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CompanyEmployee/PendingEmp')"><b><i>Pending</i></b></a>
+            <a id="pendingTab" href="#" onclick="clickOnTab('<%=sURLPrefix%>/CompanyDepEmployee/PendingEmp')"><b><i>Pending</i></b></a>
         </li>
     </ul>
 </div>
@@ -116,7 +116,7 @@
                                     <%}%>
                                 </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails(<%=model.getCompanyUserEmpId()%>, '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -158,7 +158,7 @@
                                     <%}%>
                                 </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails(<%=model.getCompanyUserEmpId()%>, '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -225,7 +225,7 @@
                                     <%}%>
                                 </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails(<%=model.getCompanyUserEmpId()%>, '<%=sURLPrefix%>'/CompanyEmployee/PendingEmpDetails)"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -291,8 +291,8 @@
         <div class="col-sm-12 col-md-8">
             <div style="float: right;"> 
                 <%if (isAuthorizer) {%><%}else{%><%}%>
-                <input id="deleteBtn" type="button" class="btn btn-danger" onclick="deleteCompanyUser('<%=sURLPrefix%>'/CompanyEmployee/RemoveEmp)" value="Delete" style="width: 120px"/>
-                <input id="saveBtnn" type="button" class="btn btn-success" onclick="SaveEmp('<%=sURLPrefix%>'/CompanyEmployee/SaveEmp)" value="Save" style="width: 120px"/>
+                <input id="deleteBtn" type="button" class="btn btn-danger" onclick="deleteCompanyUser('<%=sURLPrefix%>/CompanyEmployee/RemoveEmp')" value="Delete" style="width: 120px"/>
+                <input id="saveBtnn" type="button" class="btn btn-success" onclick="SaveEmp('<%=sURLPrefix%>/CompanyEmployee/SaveEmp')" value="Save" style="width: 120px"/>
                 <input id="rejectBtn" type="button" class="btn btn-warning" onclick="rejectCompanyUser('<%=sURLPrefix%>/CompanyEmployee/RejectEmp')" value="Reject" style="width: 120px"/>                
                 <input id="verifyBtn" type="button" class="btn btn-success" onclick="verifyCompanyUser('<%=sURLPrefix%>/CompanyEmployee/VerifyEmp')" value="Verify" style="width: 120px"/> 
             </div>

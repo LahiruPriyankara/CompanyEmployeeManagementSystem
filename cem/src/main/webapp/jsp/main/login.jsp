@@ -41,7 +41,7 @@
     </head>
     <%        boolean isPswdReset = objManager.get("isPswdReset") != null ? (boolean) objManager.get("isPswdReset") : false;
     %>
-    <body style="background-image: url('${images}/logginPageBackGround.jpg');">
+    <body style="background-image: url('${images}/logginPageBackGround1.jpg');">
         <div class="container">
             <div class="row" style="margin-top: 1%;">
                 <div class="col-sm-2 col-md-2"></div>
@@ -52,8 +52,8 @@
                             <img alt="plusMark" width="170" height="170" src="${images}/compayLogo.png"/>
                         </div>
                         <div class="col-sm-6 col-md-6">
-                            <h3 style="color: #ffffff;text-align: left;padding: 10px"><b>Sampath Bank PLC</b></h3>
-                            <h5 style="color: #ffffff;text-align: left;padding: 10px"><b>Digital Employee Directory for Visitor Management</b></h5>
+                            <h3 style="color: #ffffff;text-align: left;padding: 10px"><b>My Company of Sri Lanka</b></h3>
+                            <h5 style="color: #ffffff;text-align: left;padding: 10px"><b>Employee Directory for Visitor Management</b></h5>
                             <h5></h5>
                         </div>
                     </div>
@@ -73,10 +73,10 @@
             <div class="row" style="margin-top: 1%;">
                 <div class="col-sm-4 col-md-4" ></div>
 
-                <div class="col-sm-4 col-md-4" style="box-shadow: 0 0 3px 2px #1a8cff;">                    
+                <div class="col-sm-4 col-md-4" style="box-shadow: 0 0 3px 2px #1a8cff;background-color: #ffffff">                    
                     <div class="row">
                         <div style="background-color: #1a8cff;height: 50px"> 
-                            <h3 style="color: #ffffff;text-align: center;padding-top: 10px"><b>Digital Employee Directory</b></h3>
+                            <h3 style="color: #ffffff;text-align: center;padding-top: 10px"><b>Employee Directory</b></h3>
                         </div>
                     </div>
 

@@ -30,7 +30,7 @@ public class CompanyEmployeeCommonViewController {
 	@Autowired
     private CompanyUserLogicLocal companyUserLogic;
 	
-	@RequestMapping(value = { "/CompanyEmployee/ExistingEmp" })
+	@RequestMapping(value = { "/CommonView/ExistingEmp" })
 	public ModelAndView getAllEmployeeList(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED | CompanyEmployeeCommonViewController.getAllEmployeeList()");
         Map<String, CompanyUserModel> dfumsMap = new HashMap();
@@ -73,7 +73,7 @@ public class CompanyEmployeeCommonViewController {
 		
 	}
 	
-	@RequestMapping(value = { "/CompanyEmployee/EmployeeDetailsForCommon" })
+	@RequestMapping(value = { "/CommonView/EmployeeDetailsForCommon" })
 	public ModelAndView getEmployeeDetailsForCommonView(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
 		System.out.println("ENTERED | CompanyEmployeeCommonViewController.getEmployeeDetailsForCommonView()");
         CompanyUserModel modelFromCEM = null;

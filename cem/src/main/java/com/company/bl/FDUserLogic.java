@@ -349,8 +349,125 @@ public class FDUserLogic implements FDUserLogicLocal {
             if (userMap.isEmpty()) {
                 Log.error("ERROR   | Bellow record is already verified.");
                 throw new SBLException("Bellow record is already verified.");
+            }           	
+            
+            fdUserModel.setVerifiedBy(Integer.parseInt(userData.getUSER_ID()));
+            fdUserModel.setVerifiedDate(APPUtills.getCurrentDate());
+            fdUserModel.setRecStatus(ApplicationConstants.RECORD_STATUS_VERIFY);
+            
+            
+            System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
+            if (fdUserModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_NEW)) {
+            	
+            	fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_REGISTER);
+            	
+            	// ------------------------- CREATE USER IN COMPANY SERVICE -------------------------------------
+                serviceUrl = ApplicationConstants.CREATE_NON_COMPANY_USER + "/" + fdUserModel.getFdUserName();
+                System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
+                url = new URL(serviceUrl);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json");
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                	System.out.println("ERROR   | Failed : HTTP error code : " + conn.getResponseCode());
+                    throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                }
+                br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                response = "";
+                responseFromBR="";
+                while ((responseFromBR = br.readLine()) != null) {
+                	System.out.println("MESSAGE | Response : " + responseFromBR);
+                	response = responseFromBR;
+                }
+                
+                if(response.equalsIgnoreCase(ApplicationConstants.USER_CREATION_ERROR)){
+                	throw new SBLException("Can not create a user in company service.try again later.");
+                }
+                
+                // ------------------------- ACTIVE THE PASSWORD OF NON COMPANY USER IN COMPANY SERVICE -------------------------------------
+                serviceUrl = ApplicationConstants.VERIFY_NON__COMPANY_USER + "/" + fdUserModel.getFdUserName();
+                System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
+                url = new URL(serviceUrl);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json");
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                	System.out.println("ERROR   | Failed : HTTP error code : " + conn.getResponseCode());
+                    throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                }
+                br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                response = "";
+                responseFromBR="";
+                while ((responseFromBR = br.readLine()) != null) {
+                	System.out.println("MESSAGE | Response : " + responseFromBR);
+                	response = responseFromBR;
+                }
+                
+                if(!response.equalsIgnoreCase("true")){
+                	throw new SBLException("Can not active the password in company service.Please try again later.");
+                }
+                fdUserModel.setFdUserMasterId(seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.FD_USER_MASTER_ID));
+            }else{
+            	if(isSecurepassProcess){
+            		// ------------------------- ACTIVE THE PASSWORD OF NON COMPANY USER IN COMPANY SERVICE -------------------------------------
+                    serviceUrl = ApplicationConstants.ACTIVE_PASSWD_NON_COMPANY_USER + "/" + fdUserModel.getFdUserName();
+                    System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
+                    url = new URL(serviceUrl);
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    	System.out.println("ERROR   | Failed : HTTP error code : " + conn.getResponseCode());
+                        throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+                    }
+                    br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+                    response = "";
+                    responseFromBR="";
+                    while ((responseFromBR = br.readLine()) != null) {
+                    	System.out.println("MESSAGE | Response : " + responseFromBR);
+                    	response = responseFromBR;
+                    }
+                    
+                    if(!response.equalsIgnoreCase("true")){
+                    	throw new SBLException("Can not active the password in company service.Please try again later.");
+                    }
+                    
+                    fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_ACTIVE);
+            	}
+            	
             }
-            serviceUrl = ApplicationConstants.ACTIVE_PASSWD_NON_COMPANY_USER + "/" + fdUserModel.getFdUserName();
+            int actionType = fdUserModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_NEW)?1:2;
+            System.out.println("ACTION TYPE FOR MASTER TBL : "+actionType);
+            //Update Temp Table
+            fDUserTmpFacade.modifyUser(fdUserModel,2);
+            //Update Master Table
+        	fDUserMasterFacade.modifyUser(fdUserModel,actionType);
+            
+            isSuccess = true;
+        } catch (Exception ex) {
+            Log.error("ERROR   | Unable to verify." + ex.getMessage(), ex);
+            //isSuccess = false;
+            throw new SBLException(ex.getMessage());
+        }
+        System.out.println("LEFT    | FDUserLogic.verifyUser()");
+        return isSuccess;
+    }
+    
+    
+    @Override
+    public boolean setPassword(String userName, String userPassword) throws SBLException {
+       System.out.println("ENTERED | FDUserLogic.setPassword()");
+        boolean isSuccess = false;
+        HttpURLConnection conn = null;
+        URL url;
+        String serviceUrl;
+        BufferedReader br;
+        String response = "",responseFromBR;
+        try {        	
+        	serviceUrl = ApplicationConstants.SET_PASSWD_NON_COMPANY_USER + "/" + userName+"/"+userPassword;
             System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
             url = new URL(serviceUrl);
             conn = (HttpURLConnection) url.openConnection();
@@ -371,96 +488,25 @@ public class FDUserLogic implements FDUserLogicLocal {
             
             if(!response.equalsIgnoreCase("true")){
             	throw new SBLException("Can not active the password.Please try again later.");
-            }	
-            
-            fdUserModel.setVerifiedBy(Integer.parseInt(userData.getUSER_ID()));
-            fdUserModel.setVerifiedDate(APPUtills.getCurrentDate());
-            fdUserModel.setRecStatus(ApplicationConstants.RECORD_STATUS_VERIFY);
-            fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_ACTIVE);
-            
-            System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
-            if (fdUserModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_NEW)) {
-
-                //Create In Master Table
-                fDUserMasterFacade.modifyUser(fdUserModel,1);
-            } else {
-                //Update Master Table
-            	fDUserMasterFacade.modifyUser(fdUserModel,2);
             }
-            //Update Temp Table
-            fDUserTmpFacade.modifyUser(fdUserModel,2);
-            isSuccess = true;
-        } catch (Exception ex) {
-            Log.error("ERROR   | Unable to verify." + ex.getMessage(), ex);
-            //isSuccess = false;
-            throw new SBLException(ex.getMessage());
-        }
-        System.out.println("LEFT    | FDUserLogic.verifyUser()");
-        return isSuccess;
-    }
-    
-    
-    @Override
-    public boolean setPasswordDEDirectryUser(String userName, String userPassword) throws SBLException {
-       System.out.println("ENTERED | DedFDUserLogic.setPasswordDEDirectryUser()");
-        boolean isSuccess = false;
-        HttpURLConnection conn = null;
-        URL url;
-        String serviceUrl;
-        BufferedReader br;
-        String response = "",responseFromBR;
-        try {
-        	FdUserModel fdUserModel = getFdUserByUserName(Arrays.asList(userName));
+            
+            FdUserModel fdUserModel = getFdUserByUserName(Arrays.asList(userName));
             Map<Integer, FdUserModel> userMap = fDUserTmpFacade.getTempFdUsers(Arrays.asList(fdUserModel.getFdUserMasterId()), ApplicationConstants.MASTER_DATA);
 
+            if (userMap.size() > 0) {
+                System.out.println("ERROR   | Password is already sent for authorization.");
+                 throw new SBLException("Password is already sent for authorization.");
+             }
+             
+             System.out.println("MESSAGE | Successfully set the password.");
+
+             fdUserModel.setFdUserTmpId(seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.FD_USER_TMP_ID));
+             fdUserModel.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
+             fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD);
+
+            System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
+            fDUserTmpFacade.modifyUser(fdUserModel,1);
             
-            String status = fdUserModel.getSecurepassUserStatus()!=null?fdUserModel.getSecurepassUserStatus():"";
-            
-        	if(status.equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD_AUTH)){     //Going to reset old password   		
-        		serviceUrl = ApplicationConstants.SET_PASSWD_NON_COMPANY_USER + "/" + userName+"/"+userPassword;
-                System.out.println("MESSAGE | UpmRestService URL : " + serviceUrl);
-                url = new URL(serviceUrl);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setDoOutput(true);
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Content-Type", "application/json");
-                if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                	System.out.println("ERROR   | Failed : HTTP error code : " + conn.getResponseCode());
-                    throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
-                }
-                br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-                response = "";
-                responseFromBR="";
-                while ((responseFromBR = br.readLine()) != null) {
-                	System.out.println("MESSAGE | Response : " + responseFromBR);
-                	response = responseFromBR;
-                }
-                
-                if(!response.equalsIgnoreCase("true")){
-                	throw new SBLException("Can not active the password.Please try again later.");
-                }
-                
-                fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_ACTIVE);
-                System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
-                fDUserMasterFacade.modifyUser(fdUserModel,2);
-                
-        	}else{ //Going to set new password  
-                
-                if (userMap.size() > 0) {
-                    System.out.println("ERROR   | Password is already sent for authorization.");
-                     throw new SBLException("Password is already sent for authorization.");
-                 }
-                 
-                 System.out.println("MESSAGE | Successfully set the password.");
-
-                 fdUserModel.setFdUserTmpId(seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.FD_USER_TMP_ID));
-                 fdUserModel.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
-                 fdUserModel.setSecurepassUserStatus(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD);
-
-                System.out.println("MESSAGE | fdUserModel.toString() " + fdUserModel.toString());
-                fDUserTmpFacade.modifyUser(fdUserModel,1);
-        	}            
-
             //SETTING USER PASSWORD SUCCESSFULLY
             isSuccess = true;
            System.out.println("MESSAGE |  User Password Set Successfull");
@@ -471,7 +517,7 @@ public class FDUserLogic implements FDUserLogicLocal {
            System.out.println("ERROR   | " + e.getMessage());
             throw new SBLException("User Password Set fail.");
         }
-       System.out.println("LEFT    | DedFDUserLogic.setPasswordDEDirectryUser()");
+       System.out.println("LEFT    | FDUserLogic.setPassword()");
         return isSuccess;
     }
     

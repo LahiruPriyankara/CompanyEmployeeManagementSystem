@@ -236,13 +236,15 @@ public class FrontDeskUserMngController {
 		} catch (SBLException ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			//return "frontDeskUser/existingFrontDeskUser";
 		} catch (Exception ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			//return "frontDeskUser/existingFrontDeskUser";
 		}
 
 		System.out.println("LEFT    | FrontDeskUserMngAction.saveNewFrontDeskUser()");
-		return "redirect:/FrontDeskUser/ExistingFrontDeskUsers";
+		return "frontDeskUser/existingFrontDeskUser";
 	}
 	
 	@RequestMapping(value = "/FrontDeskUser/SaveModifiedFdUser")
@@ -265,9 +267,11 @@ public class FrontDeskUserMngController {
 		} catch (SBLException ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			return "frontDeskUser/existingFrontDeskUser";
 		} catch (Exception ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			return "frontDeskUser/existingFrontDeskUser";
 		}
 
 		System.out.println("LEFT    | FrontDeskUserMngAction.saveModifiedFdUser()");
@@ -294,9 +298,11 @@ public class FrontDeskUserMngController {
 		} catch (SBLException ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			return "frontDeskUser/existingFrontDeskUser";
 		} catch (Exception ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			return "frontDeskUser/existingFrontDeskUser";
 		}
 
 		System.out.println("LEFT    | FrontDeskUserMngAction.saveReModifiedFrontDeskUser()");
@@ -323,9 +329,11 @@ public class FrontDeskUserMngController {
 		} catch (SBLException ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			return "frontDeskUser/existingFrontDeskUser";
 		} catch (Exception ex) {
 			System.out.println("ERROR   | " + ex.getMessage());
 			req.setAttribute("errMsg", ex.getMessage());
+			return "frontDeskUser/existingFrontDeskUser";
 		}
 
 		System.out.println("LEFT    | FrontDeskUserMngAction.saveNewFrontDeskUserPassword()");
@@ -469,16 +477,19 @@ public class FrontDeskUserMngController {
             eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.FRONT_DESK_USER, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         } catch (Exception ex) {
             eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.FRONT_DESK_USER, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR   | " + ex.getMessage() + "\n");
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         }
 
         System.out.println("LEFT    | FrontDeskUserMngAction.rejectFrontDeskUser()");
         return "redirect:/FrontDeskUser/PendingFrontDeskUsers";
     }
 
+	@RequestMapping(value = "FrontDeskUser/RemoveFrontDeskUser")
     public String cancelFrontDeskUserModification(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws SBLException {
         System.out.println("ENTERED |  FrontDeskUserMngAction.cancelFrontDeskUserModification()");
         Map<Integer, FdUserModel> userMap = new HashMap();
@@ -524,10 +535,12 @@ public class FrontDeskUserMngController {
             eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.FRONT_DESK_USER, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         } catch (Exception ex) {
             eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.FRONT_DESK_USER, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR   | " + ex.getMessage() + "\n");
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         }
 
         System.out.println("LEFT    | FrontDeskUserMngAction.cancelFrontDeskUserModification()");
@@ -553,9 +566,11 @@ public class FrontDeskUserMngController {
             
         } catch (SBLException ex) {System.out.println("ERROR | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         } catch (Exception ex) {
         	System.out.println("ERROR   | " + ex.getMessage() + "\n");
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         }
 
         System.out.println("LEFT    | FrontDeskUserMngAction.verifyFrontDeskUser()");
@@ -564,7 +579,7 @@ public class FrontDeskUserMngController {
     
     @RequestMapping(value = "/FrontDeskUser/VerifyFrontDeskUserPassword")
     public String VerifyFrontDeskUserPassword(HttpServletRequest req, HttpServletResponse resp, HttpSession session) throws SBLException {
-        System.out.println("ENTERED |  FrontDeskUserMngAction.verifyFrontDeskUser()");
+        System.out.println("ENTERED |  FrontDeskUserMngAction.VerifyFrontDeskUserPassword()");
         ObjectManager objManager = null;
 		UserData userData;
 		try {
@@ -580,12 +595,14 @@ public class FrontDeskUserMngController {
             
         } catch (SBLException ex) {System.out.println("ERROR | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         } catch (Exception ex) {
         	System.out.println("ERROR   | " + ex.getMessage() + "\n");
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         }
 
-        System.out.println("LEFT    | FrontDeskUserMngAction.verifyFrontDeskUser()");
+        System.out.println("LEFT    | FrontDeskUserMngAction.VerifyFrontDeskUserPassword()");
         return "redirect:/FrontDeskUser/PendingFrontDeskUsers";
     }
 
@@ -742,10 +759,12 @@ public class FrontDeskUserMngController {
             eventLogger.doLog(req, userData!=null?userData.getUSER_ID():"", ApplicationConstants.FRONT_DESK_USER, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         } catch (Exception ex) {
             eventLogger.doLog(req, userData!=null?userData.getUSER_ID():"", ApplicationConstants.FRONT_DESK_USER, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR   | " + ex.getMessage() + "\n");
             req.setAttribute("errMsg", ex.getMessage());
+            return "frontDeskUser/pendingFrontDeskUser";
         }
 
         System.out.println("LEFT    | FrontDeskUserMngAction.verifyReSetFrontDeskUserPassword()");  

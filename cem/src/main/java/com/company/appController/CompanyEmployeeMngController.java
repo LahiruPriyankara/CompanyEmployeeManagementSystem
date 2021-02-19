@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -36,6 +37,7 @@ import com.company.models.UserData;
 
 @Controller
 @ComponentScan(basePackages = {"com.company.bl"})
+@MultipartConfig
 public class CompanyEmployeeMngController {
 	//private static final Log log = LogFactory.getLog(CompanyEmployeeMngController.class);
 	@Autowired
@@ -45,7 +47,7 @@ public class CompanyEmployeeMngController {
     private EventLoggerLocal eventLogger;
 	
 	
-	@RequestMapping(value = { "/CompanyEmployee/SearchEmp"})
+	@RequestMapping(value = { "/CompanyDepEmployee/SearchEmp"})
 	public ModelAndView getSearchBankEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
 		System.out.println("LEFT    | CompanyEmployeeCommonViewController.getSearchBankEmp()");
 		//UserData uData;
@@ -212,7 +214,7 @@ public class CompanyEmployeeMngController {
 		
 	}
 	
-	@RequestMapping(value = { "/CompanyEmployee/PendingEmp" })
+	@RequestMapping(value = { "/CompanyDepEmployee/PendingEmp" })
 	public ModelAndView pendingEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
 		System.out.println("ENTERED | CompanyEmployeeCommonViewController.pendingEmp()");
 		ObjectManager objManager = null;
@@ -577,21 +579,21 @@ public class CompanyEmployeeMngController {
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
+            //return "employee/existingEmp";
         } catch (Exception ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
-            //return new ModelAndView("employee/existingEmp");
+            //return "employee/existingEmp";
         }
 
         System.out.println("LEFT    | CompanyEmployeeCommonViewController.saveSingleEmp()");
         //return new ModelAndView("employee/existingEmp");
-        return "redirect:/employee/existingEmp";
+        return "main/home";
 		
 	}
 	
 	@RequestMapping(value = { "/CompanyEmployee/SaveBulkEmp"})
-	public String saveBulkEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+	public ModelAndView saveBulkEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
 		System.out.println("ENTERED | CompanyEmployeeMngController.saveBulkEmp()");
         ObjectManager objManager = null;
         UserData userData;
@@ -617,12 +619,13 @@ public class CompanyEmployeeMngController {
 
         System.out.println("LEFT    | CompanyEmployeeCommonViewController.saveBulkEmp()");
         //return new ModelAndView("employee/existingEmp");
-        return "redirect:/employee/existingEmp";
+        //return "redirect:/CompanyDepEmployee/ExistingEmp";
+        return new ModelAndView("main/home");
 		
 	}	
 		
 	private void saveEmployeeDetails(ObjectManager objManager, UserData userData, boolean isBulk, HttpServletRequest req) throws SBLException {
-       System.out.println("ENTERED | BankEmployeeMngAction.saveEmployeeDetails()");
+       System.out.println("ENTERED | CompanyEmployeeCommonViewController.saveEmployeeDetails()");
         CompanyUserModel model;
         List<CompanyUserModel> companyUserModels = new ArrayList();
         boolean isSuccess = false;
@@ -645,6 +648,7 @@ public class CompanyEmployeeMngController {
                             take object from companyEmployeesMap and add to companyUserModels List to save
             Update event log
              */
+           objManager.put("userType",ApplicationConstants.BANK_DEP_USER,ApplicationConstants.SCOPE_COMPANY_USER);
            System.out.println("MESSAGE | isBulk :" + isBulk);
             if (!isBulk) {
                 model = objManager.get("CEMmodelMaster") != null ? (CompanyUserModel) objManager.get("CEMmodelMaster") : new CompanyUserModel();
@@ -730,6 +734,10 @@ public class CompanyEmployeeMngController {
             //eventDesc = "Save bank user in temp table.";
             //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", "", "", ApplicationConstants.EVENTSUCCESSFUL);
             req.setAttribute("rtnMsg", "Successfully save.");
+            
+            System.out.println("Going to fetch all existing data....");
+            getEmployeeListFromCem(objManager, ApplicationConstants.MASTER_DATA, userData);
+            
         } catch (SBLException ex) {
             eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
            System.out.println("ERROR | " + ex.getMessage());
@@ -741,7 +749,7 @@ public class CompanyEmployeeMngController {
             throw new SBLException("Unable to save employee details");
         }
 
-       System.out.println("LEFT    |  BankEmployeeMngAction.saveEmployeeDetails()");
+       System.out.println("LEFT    |  CompanyEmployeeCommonViewController.saveEmployeeDetails()");
     }
 	
 	
@@ -749,7 +757,7 @@ public class CompanyEmployeeMngController {
 	
 	
 	@RequestMapping(value = { "/CompanyEmployee/RejectEmp"})
-	public String rejectEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+	public ModelAndView rejectEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED | CompanyEmployeeMngController.rejectEmployeeDetails()");
         CompanyUserModel model;
         List<CompanyUserModel> companyUserModels = new ArrayList();
@@ -767,7 +775,7 @@ public class CompanyEmployeeMngController {
              */
         	objManager = new ObjectManager(session);
         	userData = (UserData) objManager.get("userData");
-        	
+        	objManager.put("userType",ApplicationConstants.BANK_DEP_USER,ApplicationConstants.SCOPE_COMPANY_USER);
         	String result = checkSessionTimeOut(userData,objManager);
         	if(APPUtills.isThisStringValid(result)){
         		throw new Exception(result);
@@ -817,6 +825,9 @@ public class CompanyEmployeeMngController {
                 System.out.println("ERROR | No ids recived to reject.");
                 throw new SBLException("Please select rows to reject.");
             }
+            
+            System.out.println("Going to fetch all existing data....");
+            getEmployeeListFromCem(objManager, ApplicationConstants.TEMP_DATA, userData);
 
         } catch (SBLException ex) {
             eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, "", "Reject - Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
@@ -830,12 +841,12 @@ public class CompanyEmployeeMngController {
 
         System.out.println("LEFT    | CompanyEmployeeMngController.rejectEmployeeDetails()");
         //return new ModelAndView("employee/pendingEmp");
-        return "redirect:/employee/pendingEmp";
+        return new ModelAndView("employee/pendingEmp");
 		
 	}
 		
 	@RequestMapping(value = { "/CompanyEmployee/RemoveEmp"})
-	public String removeEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+	public ModelAndView removeEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED |  CompanyEmployeeMngController.removeEmployeeDetails()");
         List<CompanyUserModel> companyUserModels = new ArrayList();
 
@@ -853,7 +864,7 @@ public class CompanyEmployeeMngController {
              */
         	objManager = new ObjectManager(session);
         	userData = (UserData) objManager.get("userData");
-        	
+        	objManager.put("userType",ApplicationConstants.BANK_DEP_USER,ApplicationConstants.SCOPE_COMPANY_USER);
         	String result = checkSessionTimeOut(userData,objManager);
         	if(APPUtills.isThisStringValid(result)){
         		throw new Exception(result);        		
@@ -885,9 +896,11 @@ public class CompanyEmployeeMngController {
                     req.setAttribute("rtnMsg", "Successfully delete.");
                 }
             } else {
-                System.out.println("ERROR | No ids recived to reject.");
-                throw new SBLException("Please select rows to reject.");
+                System.out.println("ERROR | No ids recived to remove.");
+                throw new SBLException("Please select rows to remove.");
             }
+            System.out.println("Going to fetch all existing data....");
+            getEmployeeListFromCem(objManager, ApplicationConstants.TEMP_DATA, userData);
         } catch (SBLException ex) {
             eventLogger.doLog(req,  (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, eventAction, " Delete - Fail. " + "Message : " + ex.getMessage(), masterObjectToString, tempObjectToString, ApplicationConstants.EVENTFAIL);
             System.out.println("ERROR | " + ex.getMessage());
@@ -900,12 +913,12 @@ public class CompanyEmployeeMngController {
 
         System.out.println("LEFT    | CompanyEmployeeMngController.removeEmployeeDetails()");
         //return new ModelAndView("employee/pendingEmp");
-        return "redirect:/employee/pendingEmp";
+        return new ModelAndView("employee/pendingEmp");
 		
 	}
 	
 	@RequestMapping(value = { "/CompanyEmployee/VerifyEmp"})
-	public String verifyEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+	public ModelAndView verifyEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED | CompanyEmployeeMngController.verifyEmployeeDetails()");
         CompanyUserModel model;
         List<CompanyUserModel> companyUserModels = new ArrayList();
@@ -924,7 +937,7 @@ public class CompanyEmployeeMngController {
         	
         	objManager = new ObjectManager(session);
         	userData = (UserData) objManager.get("userData");
-        	
+        	objManager.put("userType",ApplicationConstants.BANK_DEP_USER,ApplicationConstants.SCOPE_COMPANY_USER);
         	String result = checkSessionTimeOut(userData,objManager);
         	if(APPUtills.isThisStringValid(result)){
         		throw new Exception(result);        		        		
@@ -968,6 +981,8 @@ public class CompanyEmployeeMngController {
                 System.out.println("ERROR | No ids recived to verify.");
                 throw new SBLException("Please select rows to verify.");
             }
+            System.out.println("Going to fetch all existing data....");
+            getEmployeeListFromCem(objManager, ApplicationConstants.TEMP_DATA, userData);
 
         } catch (SBLException ex) {
             eventLogger.doLog(req, (userData!=null?userData.getUSER_ID():""), ApplicationConstants.BANK_EMPLOYEE, "", "Verification - Fail. " + "Message : " + ex.getMessage(), "", "", ApplicationConstants.EVENTFAIL);
@@ -981,7 +996,7 @@ public class CompanyEmployeeMngController {
 
         System.out.println("LEFT    | CompanyEmployeeMngController.verifyEmployeeDetails()");
         //return new ModelAndView("employee/pendingEmp");
-        return "redirect:/employee/pendingEmp";
+        return new ModelAndView("employee/pendingEmp");
 		
 	}
 
@@ -1091,9 +1106,10 @@ public class CompanyEmployeeMngController {
                 throw new SBLException("Null Object.");
             }
             String empId = model.getCompanyUserEmpId();
-
+/*
             Part filePart = req.getPart("profPic" + empId);
-            //System.out.println("MESSAGE |  filled object => filePart : " + filePart);
+            System.out.println("MESSAGE |  filled object => profPic" + empId);
+            System.out.println("MESSAGE |  filled object => filePart : " + filePart);
             String fileName = getFileName(filePart);
             if (APPUtills.isThisStringValid(fileName)) {
                 if (!isValidFileType(fileName)) {
@@ -1106,7 +1122,7 @@ public class CompanyEmployeeMngController {
 
                 model.setCompanyUserProfImg(fileAsByteArray);
             }
-
+*/
             if (!isBulk) {
                 model.setCompanyUserEmpId(req.getParameter("empId" + empId)); //Emp Id ------------ UPM related value          
                 model.setCompanyUserFirstName(req.getParameter("fName" + empId));//First Name ------------ UPM related value

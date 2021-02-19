@@ -15,13 +15,13 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.company.common.ApplicationConstants;
 import com.company.common.SBLException;
 import com.company.dbconfig.DbConfig;
 import com.company.dto.FdUserMaster;
-import com.company.dto.FdUserTmp;
 import com.company.models.FdUserModel;
 
 
@@ -31,6 +31,9 @@ public class FDUserMasterFacade implements FDUserMasterFacadeLocal {
 	Session session;
 	Transaction tx;
 	private static final Log log = LogFactory.getLog(FDUserMasterFacade.class);
+	
+	@Autowired
+	SeqNumberGeneratorFacadeLocal seqNumberGeneratorFacade;
 
     @Override
     public Map<Integer, FdUserModel> getAllFdUsersByUserIds(List<Integer> ids) throws Exception {
@@ -124,30 +127,32 @@ public class FDUserMasterFacade implements FDUserMasterFacadeLocal {
 	@Override
 	public boolean modifyUser(FdUserModel model, int actionType) {
 
-		log.debug("Enter | modifyVehicle");
+		System.out.println("Enter | modifyUser MASTER TBL");
 		try {
-			FdUserTmp temp =  (FdUserTmp) model.modelToObject(ApplicationConstants.MASTER_DATA);
+			System.out.println("actionType : "+actionType);
+			FdUserMaster master =  (FdUserMaster) model.modelToObject(ApplicationConstants.MASTER_DATA);
 			session = DbConfig.sessionBulder();
 			tx = session.beginTransaction();
-
+			System.out.println("master.toString() : "+master.toString());
 			if (actionType == 1) {
-				session.save(temp);
+				System.out.println("master.toString() : "+master.toString());
+				session.save(master);
 			} else if (actionType == 2) {
-				session.update(temp);
+				session.update(master);
 			} else if (actionType == 3) {
-				session.delete(temp);
+				session.delete(master);
 			} else {
 				throw new Exception("Invalid Action Type");
 			}
 
 			tx.commit();
-			log.debug("persist successful");
+			System.out.println("persist successful");
 			return true;
 		} catch (Exception e) {
 			log.error("persist failed", e);
 			return false;
 		} finally {
-			log.debug("Left | modifyVehicle");
+			log.debug("Left | modifyUser");
 			if (session != null)
 				session.close();
 		}

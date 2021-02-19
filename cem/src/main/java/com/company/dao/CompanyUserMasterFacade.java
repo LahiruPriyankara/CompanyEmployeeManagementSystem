@@ -36,8 +36,8 @@ public class CompanyUserMasterFacade implements CompanyUserMasterFacadeLocal {
 	Transaction tx;
     private static Logger dedLog = LogManager.getLogger(CompanyUserTmpFacade.class);
 
-    //@Autowired
-    //private SeqNumberGeneratorBeanLocal seqNumberGeneratorBean;
+    @Autowired
+   	SeqNumberGeneratorFacadeLocal seqNumberGeneratorFacade;
 
     @Override
     public Map<String, CompanyUserModel> getMasterCompanyUsers(List<String> ids, String depCode) throws Exception {
@@ -116,6 +116,7 @@ public class CompanyUserMasterFacade implements CompanyUserMasterFacadeLocal {
     public boolean verifyEmp(List<CompanyUserModel> CompanyUserModelList) throws Exception {
         System.out.println("ENTERED | CompanyUserMasterFacade.verifyEmp()");
         boolean isSuccess = false;
+        int id = 0;
         try {
         	session = DbConfig.sessionBulder();  
             tx = session.beginTransaction();
@@ -125,15 +126,21 @@ public class CompanyUserMasterFacade implements CompanyUserMasterFacadeLocal {
                 if (CompanyUserModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_MODIFY)) {
                     System.out.println("MESSAGE | EDIT => Saving modify record : " + CompanyUserModel.toString());
                     session.update((CompanyUserMaster) CompanyUserModel.modelToObject(ApplicationConstants.MASTER_DATA));
-                    tx.commit();
+                   
                 } else {
                     System.out.println("MESSAGE | CREATE => Saving new record : " + CompanyUserModel.toString());
-                    //CompanyUserModel.setCompanyUserMasterId(seqNumberGeneratorBean.getNextCompanyUserMasterId());
+                    if(id == 0){
+                		id = seqNumberGeneratorFacade.getSequenceNumber(ApplicationConstants.COMPANY_USER_MASTER_ID);
+                	}else{
+                		id++;
+                	}
+                    CompanyUserModel.setCompanyUserMasterId(id);
                     session.save((CompanyUserMaster) CompanyUserModel.modelToObject(ApplicationConstants.MASTER_DATA));
-                    tx.commit();
+                   
                 }
 
             }
+            tx.commit();
             isSuccess = true;
         } catch (Exception ex) {
             //context.setRollbackOnly();

@@ -24,19 +24,27 @@ public class ApplicationConstants {
     public final static int SCOPE_COMMON_VIEW = 4;
     
     
-    public static String GET_ALL_DEPARTMRNTS = "http://localhost:8000/company/allDepartments";
-    public static String GET_ALL_NON_COMPANY_USERS = "http://localhost:8000/company/allNonCompanyUsers";
-    public static String CREATE_NON_COMPANY_USER = "http://localhost:8000/company/createNonCompanyUser"; //http://localhost:8000/company/createNonCompanyUser/{userId}
-    public static String UNLOCK_PASSWD_NON_COMPANY_USER = "http://localhost:8000/company/unlockPasswordNonCompanyUser";//http://localhost:8000/company/unlockPasswordNonCompanyUser/{userId}
-    public static String SET_PASSWD_NON_COMPANY_USER = "http://localhost:8000/company/setPasswordNonCompanyUser";//http://localhost:8000/company/setPasswordNonCompanyUser/{userId}/{newPassword}
-    public static String ACTIVE_PASSWD_NON_COMPANY_USER = "http://localhost:8000/company/activePasswordNonCompanyUser";//http://localhost:8000/company/activePasswordNonCompanyUser/{userId}
-    public static String RESET_PASSWD_NON_COMPANY_USER = "http://localhost:8000/company/resetPasswordNonCompanyUser";//http://localhost:8000/company/resetPasswordNonCompanyUser/{userId}/{newPassword}
-    public static String LOGGIN_NON_COMPANY_USER = "http://localhost:8000/company/loginNonCompanyUser";//http://localhost:8000/company/loginNonCompanyUser/{userId}/{password}
-    public static String GET_ALL_COMPANY_USERS = "http://localhost:8000/company/allCompanyUsers";//http://localhost:8000/company/allCompanyUsers
-    public static String GET_ALL_COMPANY_USER_BY_DEP_ID = "http://localhost:8000/company/companyUsersByDepId";//http://localhost:8000/company/companyUsersByDepId/{depId}
-    public static String GET_COMPANY_USER_BY_USER_ID = "http://localhost:8000/company/companyUsersByUserId";//http://localhost:8000/company/companyUsersByUserId/{userId}
-    public static String LOGGIN_COMPANY_USER = "http://localhost:8000/company/loginCompanyUser";//http://localhost:8000/company/loginCompanyUser/{userId}/{password}
+    public static String GET_ALL_DEPARTMRNTS = "";//"http://localhost:8000/company/allDepartments";
+    public static String GET_ALL_NON_COMPANY_USERS = "";//"http://localhost:8000/company/allNonCompanyUsers";
+    public static String CREATE_NON_COMPANY_USER = "";//"http://localhost:8000/company/createNonCompanyUser"; //http://localhost:8000/company/createNonCompanyUser/{userId}
+    public static String VERIFY_NON__COMPANY_USER = "";//"http://localhost:8000/company/verifyNonCompanyUser"; //http://localhost:8000/company/verifyNonCompanyUser/{userId}
+    public static String UNLOCK_PASSWD_NON_COMPANY_USER = "";//"http://localhost:8000/company/unlockPasswordNonCompanyUser";//http://localhost:8000/company/unlockPasswordNonCompanyUser/{userId}
+    public static String SET_PASSWD_NON_COMPANY_USER = "";//"http://localhost:8000/company/setPasswordNonCompanyUser";//http://localhost:8000/company/setPasswordNonCompanyUser/{userId}/{newPassword}
+    public static String ACTIVE_PASSWD_NON_COMPANY_USER = "";//"http://localhost:8000/company/activePasswordNonCompanyUser";//http://localhost:8000/company/activePasswordNonCompanyUser/{userId}
+    public static String RESET_PASSWD_NON_COMPANY_USER = "";//"http://localhost:8000/company/resetPasswordNonCompanyUser";//http://localhost:8000/company/resetPasswordNonCompanyUser/{userId}/{newPassword}
+    public static String LOGGIN_NON_COMPANY_USER = "";//"http://localhost:8000/company/loginNonCompanyUser";//http://localhost:8000/company/loginNonCompanyUser/{userId}/{password}
+    public static String GET_ALL_COMPANY_USERS = "";//"http://localhost:8000/company/allCompanyUsers";//http://localhost:8000/company/allCompanyUsers
+    public static String GET_ALL_COMPANY_USER_BY_DEP_ID = "";//"http://localhost:8000/company/companyUsersByDepId";//http://localhost:8000/company/companyUsersByDepId/{depId}
+    public static String GET_COMPANY_USER_BY_USER_ID = "";//"http://localhost:8000/company/companyUsersByUserId";//http://localhost:8000/company/companyUsersByUserId/{userId}
+    public static String LOGGIN_COMPANY_USER = "";//"http://localhost:8000/company/loginCompanyUser";//http://localhost:8000/company/loginCompanyUser/{userId}/{password}
+    public static String COM_ADMIN_ENTERER_ASSIGN = "";//"http://localhost:8000/company/companyUsersAssignCommonAdminAuthRole";//http://localhost:8000/company/companyUsersAssignCommonAdminAuthRole/{userId}/{role}
 	
+    
+   
+    
+    public static final String USER_CREATE = "CREATE";
+	public static final String USER_ALREADY_EXISTING = "ALREADY_EXIST";
+	public static final String USER_CREATION_ERROR = "ERROR";
 
     public static final String LOCK_USER = "Lock User.Please Contact Company Admin User.";
 	public static final String SET_NEW_PASSWORD = "Please Set New Passwords.";
@@ -101,6 +109,11 @@ public class ApplicationConstants {
     public final static String RECORD_STATUS_PENDING = "P";
     public final static String RECORD_STATUS_REJECT = "R";
     public final static String RECORD_STATUS_VERIFY = "V";
+    
+    public final static String PERFORMING_ACTCION_SAVE= "SAVE";
+    public final static String PERFORMING_ACTCION_REJECT = "REJECT";
+    public final static String PERFORMING_ACTCION_DELETE = "DELETE";
+    public final static String PERFORMING_ACTCION_VERIFY = "VERIFY";
 
     public final static String SECUREPASS_USER_REGISTER = "REGISTER";
     public final static String SECUREPASS_USER_AUTHORIZE = "AUTHORIZE";
@@ -115,6 +128,8 @@ public class ApplicationConstants {
     public final static int COMPANY_USER_TMP_ID = 2;
     public final static int FD_USER_MASTER_ID = 3;
     public final static int FD_USER_TMP_ID = 4;
+    public final static int COMMON_USER_MASTER_ID = 5;
+    public final static int COMMON_USER_TMP_ID = 6;
 
     public static List<String> USER_GRADES = new ArrayList<>();
     public final static List<String> USER_GENDER = Arrays.asList(new String[]{"M", "F"});

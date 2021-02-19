@@ -8,7 +8,6 @@ package com.company.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.company.dto.CompanyUserMaster;
 import com.company.models.CompanyUserModel;
 
 

@@ -28,7 +28,7 @@
 <div class="row">
     <div class="col-sm-12 col-md-12">
         <div id="tableDiv"> 
-            <div style="overflow-y: scroll;overflow-x: scroll; height:700px;border-radius: 5px">
+            <div>
                 <br>
                 <table class="table table-bordered table-hover" id="mainTable">
                     <thead>
@@ -54,7 +54,7 @@
                         <%for (CompanyUserModel model : dvmUsersList) {%>
                         <tr>
                             <td style="text-align: right">
-                                <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails(<%=model.getCompanyUserEmpId()%>, '<%=sURLPrefix%>'/CompanyEmployee/EmployeeDetailsForCommon)"></span>
+                                <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CommonView/EmployeeDetailsForCommon')"></span>
                             </td>
                             <td>
                                 <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>

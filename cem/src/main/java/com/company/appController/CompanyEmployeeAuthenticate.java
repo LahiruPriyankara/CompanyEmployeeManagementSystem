@@ -27,6 +27,7 @@ import com.company.common.AppConstants;
 import com.company.common.ApplicationConstants;
 import com.company.common.ObjectManager;
 import com.company.common.SBLException;
+import com.company.init.Initializer;
 import com.company.models.CompanyUserModel;
 import com.company.models.FdUserModel;
 import com.company.models.UserData;
@@ -52,8 +53,16 @@ public class CompanyEmployeeAuthenticate {
 
 	
 	@RequestMapping(value = {"/", "/authonticate","/authonticate/RedirectLogin"})
-	public ModelAndView loginPage(){
+	public ModelAndView loginPage(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+		ObjectManager objManager = null;
 		try {
+			System.out.println("GOING TO INITIALIZE THE PARAMETERS. START");
+			Initializer.initCommonParams();
+			System.out.println("GOING TO INITIALIZE THE PARAMETERS. END");
+			
+			objManager = new ObjectManager(session);
+			objManager.remove("isPswdReset");
+			 
 			return new ModelAndView("main/login");          
         } catch (Exception ex) {
         	return new ModelAndView("main/login");   
@@ -100,7 +109,7 @@ public class CompanyEmployeeAuthenticate {
 	}
 	
 	@RequestMapping(value = { "/company" })
-	public ModelAndView loginPage(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
+	public ModelAndView login(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		HttpURLConnection conn = null;
 		URL url;
         String serviceUrl;
@@ -246,7 +255,8 @@ public class CompanyEmployeeAuthenticate {
                     
                 }else if (dfum.getSecurepassUserStatus().equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_REGISTER) || dfum.getSecurepassUserStatus().equalsIgnoreCase(ApplicationConstants.SECUREPASS_USER_SET_PASSWORD_AUTH)) {//going to set password
                     System.out.println("MESSAGE | ReDirect to password setup.");
-                    eventLogger.doLog(req, userData.getAD_USER_ID(), ApplicationConstants.EVENT_LOG_LOGIN, "PASSWORDSET", "password set Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
+                    objManager.put("isPswdReset",true);
+                    eventLogger.doLog(req, userData!=null?userData.getAD_USER_ID():userName, ApplicationConstants.EVENT_LOG_LOGIN, "PASSWORDSET", "password set Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
         			return new ModelAndView("main/login");
                 }
             }	
@@ -255,7 +265,8 @@ public class CompanyEmployeeAuthenticate {
             System.out.println("MESSAGE | is upateReference table : " + userReferenceLogic.upateReferenceByUserId(userData)); 
             objManager.put("userData",userData,ApplicationConstants.SCOPE_GLOBAL);
             eventLogger.doLog(req, userData.getAD_USER_ID(), ApplicationConstants.EVENT_LOG_LOGIN, "LOGIN", "Login Successful", "", "", ApplicationConstants.EVENTSUCCESSFUL);
-			return new ModelAndView("main/home");
+		
+            return new ModelAndView("main/home");
 
 		}catch (SBLException ex) {
 			eventLogger.doLog(req, userData!=null?userData.getAD_USER_ID():"", ApplicationConstants.EVENT_LOG_LOGIN, "LOGIN", "Login Fail", "", "", ApplicationConstants.EVENTFAIL);
@@ -270,20 +281,20 @@ public class CompanyEmployeeAuthenticate {
 		}
 
 	}
-	
-	
-	
-	
+		
 	@RequestMapping(value = { "/authonticate/SetPassword" })
 	public ModelAndView setPassword(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
-		System.out.println("ENTERED | EmployeeLoginAction.userLogout()");
+		System.out.println("ENTERED | EmployeeLoginAction.setPassword()");
 		ModelAndView mv = null;
 		ObjectManager objManager = null;
-		UserData userData;
+		//UserData userData = null;
 		String userName = "", password = "", confirmPassword = "";
         try {
         	System.out.println("MESSAGE | Front Desk User Password Resetting.");
 
+        	objManager = new ObjectManager(session);
+            //userData = (UserData) objManager.get("userData");
+        	
             userName = req.getParameter("txtUserId").trim();
             password = req.getParameter("txtPassword").trim();
             confirmPassword = req.getParameter("txtConformPassword").trim();
@@ -293,7 +304,7 @@ public class CompanyEmployeeAuthenticate {
             } else if (!password.equalsIgnoreCase(confirmPassword)) {
                 throw new SBLException("Passwords are not match.");
             }
-            if (fdUserLogic.setPasswordDEDirectryUser(userName, password)) {
+            if (fdUserLogic.setPassword(userName, password)) {
                 //If success
                 objManager.remove("isPswdReset");
                 System.out.println("MESSAGE | New password successfull save.");
@@ -303,14 +314,10 @@ public class CompanyEmployeeAuthenticate {
         	eventLogger.doLog(req, "", ApplicationConstants.EVENT_LOG_LOGIN, "LOGOFF", "Logoff fail", "", "", ApplicationConstants.EVENTFAIL);
         	req.setAttribute("errMsg", ex.getMessage());
         }
-		System.out.println("LEFT | EmployeeLoginAction.userLogout()");
+		System.out.println("LEFT | EmployeeLoginAction.setPassword()");
 		return new ModelAndView("main/login");	
 	}
-	
-	
-	
-	
-	
+		
 	private void processLogoff(HttpSession session, HttpServletRequest req, ObjectManager objManager) throws Exception, SBLException {
         System.out.println("ENTERED | EmployeeLoginAction.processLogoff()");
         try {
@@ -326,7 +333,7 @@ public class CompanyEmployeeAuthenticate {
     }
 	
 	@RequestMapping(value = { "/authonticate/UserLogout" })
-	public ModelAndView userLogout(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+	public String userLogout(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
 		System.out.println("ENTERED | EmployeeLoginAction.userLogout()");
 		ModelAndView mv = null;
 		ObjectManager objManager = null;
@@ -346,7 +353,8 @@ public class CompanyEmployeeAuthenticate {
         	req.setAttribute("errMsg", ex.getMessage());
         }
 		System.out.println("LEFT | EmployeeLoginAction.userLogout()");
-		return new ModelAndView("main/login");	
+		//return new ModelAndView("main/login");	
+		return "redirect:/authonticate";
 	}
 	
 	

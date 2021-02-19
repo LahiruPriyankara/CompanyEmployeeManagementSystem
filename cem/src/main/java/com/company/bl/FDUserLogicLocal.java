@@ -28,7 +28,7 @@ public interface FDUserLogicLocal {
 	
 	public boolean verifyFdUserResetPassword(FdUserModel fdUserModel, UserData userData) throws Exception;
 	
-	public boolean setPasswordDEDirectryUser(String userName, String userPassword) throws SBLException;
+	public boolean setPassword(String userName, String userPassword) throws SBLException;
 	
 	public boolean updateFdUserPasswordLock(FdUserModel fdUserModel) throws Exception;
 }
