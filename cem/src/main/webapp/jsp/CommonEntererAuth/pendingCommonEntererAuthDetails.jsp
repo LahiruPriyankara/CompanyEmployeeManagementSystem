@@ -24,8 +24,8 @@
     FdUserModel masterModel = objManager.get("userModelFromMaster") != null ? (FdUserModel) objManager.get("userModelFromMaster") : new FdUserModel();
 %>
 
-<div style="text-align: center;background-image: url('${pageContext.request.contextPath}/ui/images/deailsBackGround.jpg');">
-    <img style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="plusMark" width="200" height="200" src="${pageContext.request.contextPath}/ui/images/userDefault.jpg"/>
+<div style="text-align: center;background-image: url('${images}/deailsBackGround.jpg');">
+    <img style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="plusMark" width="200" height="200" src="${images}/userDefault.jpg"/>
 </div>
 <hr>
 <table class="table table-bordered">

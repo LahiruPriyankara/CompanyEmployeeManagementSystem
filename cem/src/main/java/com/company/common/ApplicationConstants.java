@@ -22,6 +22,7 @@ public class ApplicationConstants {
     public final static int SCOPE_FD_USER = 2;
     public final static int SCOPE_COMMON_USER = 3;
     public final static int SCOPE_COMMON_VIEW = 4;
+    public final static int SCOPE_VISITOR_VIEW = 5;
     
     
     public static String GET_ALL_DEPARTMRNTS = "";//"http://localhost:8000/company/allDepartments";

@@ -105,4 +105,23 @@
         $(".titleLink").css('background', '#1a8cff');
         $("#allEmployee").css('background', '#006080');
     });
+
+function saveVisitorDetails(id,uri){
+	 var passId,nicNum;
+	 passId = document.getElementById('passId').value;
+	 nicNum = document.getElementById('nicNum').value;
+	 console.log("passId : "+passId+" , nicNum : "+nicNum);
+
+	 if (passId === "" || nicNum === "") {
+           alert("Please give pass number and NIC number.");
+		 }else{
+			 hidePage();
+	         $.post(uri, {id: id,passId: passId,nicNum: nicNum}, function (data) {
+	             $('#modelDivData').empty();
+	             $('#modelDivData').append(data);
+	             showPage();
+	         });
+		  }
+	}
+    
 </script>

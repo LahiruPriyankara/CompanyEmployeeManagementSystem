@@ -141,7 +141,7 @@ public class FrontDeskUserMngController {
 		}
 
 		System.out.println("LEFT    | FrontDeskUserMngAction.getExixtingFrontDeskUserDetails()");
-		return new ModelAndView("frontDeskUser/ExistingFrontDeskUsers");
+		return new ModelAndView("frontDeskUser/existingFrontDeskUserDetails");
 
 	}
 	

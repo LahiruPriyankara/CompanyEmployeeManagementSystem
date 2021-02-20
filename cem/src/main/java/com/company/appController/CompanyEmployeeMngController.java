@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.company.bl.CompanyUserLogicLocal;
@@ -593,7 +595,7 @@ public class CompanyEmployeeMngController {
 	}
 	
 	@RequestMapping(value = { "/CompanyEmployee/SaveBulkEmp"})
-	public ModelAndView saveBulkEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+	public ModelAndView saveBulkEmp(@RequestParam("files") MultipartFile files[],HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
 		System.out.println("ENTERED | CompanyEmployeeMngController.saveBulkEmp()");
         ObjectManager objManager = null;
         UserData userData;
@@ -605,7 +607,25 @@ public class CompanyEmployeeMngController {
         	if(APPUtills.isThisStringValid(result)){
         		throw new Exception(result);
         	}
-        	saveEmployeeDetails(objManager, userData, true, req);
+        	//saveEmployeeDetails(objManager, userData, true, req);
+        	
+        	System.out.println("files.length : "+files.length);
+        	
+        	
+        	Part filePart = req.getPart("profPicTEST_USER10");
+            System.out.println("MESSAGE |  filled object => filePart : " + filePart);
+            String fileName = getFileName(filePart);
+            if (APPUtills.isThisStringValid(fileName)) {
+                if (!isValidFileType(fileName)) {
+                    throw new SBLException("Please upload a valid file(PNG or JPEG).");
+                }
+                InputStream filecontent = filePart.getInputStream();
+
+                byte[] fileAsByteArray = new byte[1048576];
+                filecontent.read(fileAsByteArray);
+
+                //model.setCompanyUserProfImg(fileAsByteArray);
+            }
             
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());

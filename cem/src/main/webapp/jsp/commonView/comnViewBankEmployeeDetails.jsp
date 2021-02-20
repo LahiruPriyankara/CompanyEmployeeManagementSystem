@@ -29,7 +29,7 @@
     //System.out.println("modelFromDVM.getBase64Image() : "+modelFromDVM.getBase64Image());
 %>
 
-<div style="text-align: center;background-image: url('${images}/deailsBackGround.JPG');">
+<div style="text-align: center;background-image: url('${images}/deailsBackGround.jpg');">
     
     <%if (APPUtills.isThisStringValid(modelFromDVM.getBase64Image())) {%>
     <img src="data:image/png;base64,<%=modelFromDVM.getBase64Image()%>" style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="prof pic" width="200" height="200"/>
@@ -148,6 +148,14 @@
             <td><b>STATUS</b></td>
             <td><%=ApplicationConstants.statusDesc(modelFromDVM.getUserStatus())%></td>
             <td></td>
+        </tr>
+        <tr>                            
+            <td colspan="3" style="text-align: center;background-color: #bfbfbf"><b>VISITOR DETAILS</b></td>
+        </tr>
+        <tr>                            
+            <td><input class="passId" type="text" id="passId" name="passId" placeholder="enter visitor pass number.." style="width: 100%"></td>
+            <td><input class="nicNum" type="text" id="nicNum" name="nicNum" placeholder="enter visitor nic number.." style="width: 100%"></td>
+            <td><button id="saveBtn" data-dismiss="modal" type="button" class="btn btn-success" onclick="saveVisitorDetails('<%=modelFromDVM.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CommonView/SaveVisitorDetails')">Save</button> </td>
         </tr>
     </tbody>
 </table>

@@ -30,7 +30,7 @@
     FdUserModel model = objManager.get("userModel") != null ? (FdUserModel) objManager.get("userModel") : new FdUserModel();
 %>
 
-<div style="text-align: center;background-image: url('${images}/deailsBackGround.JPG');">
+<div style="text-align: center;background-image: url('${images}/deailsBackGround.jpg');">
     <img style="box-shadow: 0 0 2px 2px #331400; border-radius: 50%;margin-right: 2px" alt="plusMark" width="200" height="200" src="${images}/frontDesk.JPG"/>
 </div>
 <hr>

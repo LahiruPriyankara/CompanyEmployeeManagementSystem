@@ -174,12 +174,12 @@
                                     <%}%>
                                 </td>
                                 <td><%=APPUtills.getString(model.getCompanyUserEmpId())%></td>
-                                <td><input type="file" id="profPic<%=model.getCompanyUserEmpId()%>" name="profPic<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" style="border-color: red" disabled="true"></td>
+                                <td><input type="file" id="files" name="files" class="files" style="border-color: red"></td>
                                 <td style="text-align: left"><%=APPUtills.getString(model.getCompanyUserFirstName())%></td>
-                                <td><input type="text" id="mName<%=model.getCompanyUserEmpId()%>" name="mName<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserMiddleName())%>" readonly="true"></td>
+                                <td><input type="text" id="mName<%=model.getCompanyUserEmpId()%>" name="mName<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserMiddleName())%>" readonly></td>
                                 <td style="text-align: left"><%=APPUtills.getString(model.getCompanyUserLastName())%></td>
                                 <td>
-                                    <select id="gender<%=model.getCompanyUserEmpId()%>" name="gender<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled="true">
+                                    <select id="gender<%=model.getCompanyUserEmpId()%>" name="gender<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled>
                                         <%for (String g : gender) {%>
                                         <option value="<%=g%>" <%=model.getCompanyUserGender().equalsIgnoreCase(g) ? "selected" : ""%>> <%=ApplicationConstants.genderTypeDesc(g)%></option>
                                         <%}%>
@@ -187,7 +187,7 @@
 
                                 </td>
                                 <td>
-                                    <select id="grade<%=model.getCompanyUserEmpId()%>" name="grade<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled="true">
+                                    <select id="grade<%=model.getCompanyUserEmpId()%>" name="grade<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled>
                                         <%for (String g : grades) {%>
                                         <option value="<%=g%>" <%=model.getCompanyUserGrade().equalsIgnoreCase(g) ? "selected" : ""%>> <%=g%></option>
                                         <%}%>
@@ -195,24 +195,24 @@
                                 </td>
                                 <td><%=APPUtills.getString(model.getCompanyUserDivId())%></td>
                                 <td><%=APPUtills.getString(model.getCompanyUserDepName())%></td>
-                                <td><input type="text" id="designation<%=model.getCompanyUserEmpId()%>" name="designation<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserDestination())%>" readonly="true"></td>                            
-                                <td><input type="text" id="floor<%=model.getCompanyUserEmpId()%>" name="floor<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserFloor())%>" readonly="true" style="border-color: #ff9999"></td>
-                                <td><input type="text" id="jobdesc<%=model.getCompanyUserEmpId()%>" name="jobdesc<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserJobDesc())%>" readonly="true"></td>                            
-                                <td><input type="text" id="depExtention<%=model.getCompanyUserEmpId()%>" name="depExtention<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserDepExten())%>" readonly="true" style="border-color: #ff9999"></td>
-                                <td><input type="text" id="empMobile<%=model.getCompanyUserEmpId()%>" name="empMobile<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserOfficeMobile())%>" readonly="true"></td>
-                                <td><input type="text" id="empExtention<%=model.getCompanyUserEmpId()%>" name="empExtention<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserOfficeExten())%>" readonly="true" style="border-color: #ff9999"></td>
-                                <td><input type="text" id="empEmail<%=model.getCompanyUserEmpId()%>" name="empEmail<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserOfficeEmail())%>" readonly="true" style="border-color: #ff9999"></td>
-                                <td><input type="text" id="nextPersonName<%=model.getCompanyUserEmpId()%>" name="nextPersonName<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserContactPersonName())%>" readonly="true" style="border-color: #ff9999"></td>
-                                <td><input type="text" id="nextPersonMobile<%=model.getCompanyUserEmpId()%>" name="nextPersonMobile<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserContactPersonMobile())%>" readonly="true"></td>
-                                <td><input type="text" id="nextPersonExtention<%=model.getCompanyUserEmpId()%>" name="nextPersonExtention<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserContactPersonExten())%>" readonly="true" style="border-color: #ff9999"></td>
-                                <td><input type="text" id="remark<%=model.getCompanyUserEmpId()%>" name="remark<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserRemarks())%>" readonly="true"></td>
+                                <td><input type="text" id="designation<%=model.getCompanyUserEmpId()%>" name="designation<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserDestination())%>" readonly></td>                            
+                                <td><input type="text" id="floor<%=model.getCompanyUserEmpId()%>" name="floor<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserFloor())%>" readonly style="border-color: #ff9999"></td>
+                                <td><input type="text" id="jobdesc<%=model.getCompanyUserEmpId()%>" name="jobdesc<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserJobDesc())%>" readonly></td>                            
+                                <td><input type="text" id="depExtention<%=model.getCompanyUserEmpId()%>" name="depExtention<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserDepExten())%>" readonly style="border-color: #ff9999"></td>
+                                <td><input type="text" id="empMobile<%=model.getCompanyUserEmpId()%>" name="empMobile<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserOfficeMobile())%>" readonly></td>
+                                <td><input type="text" id="empExtention<%=model.getCompanyUserEmpId()%>" name="empExtention<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserOfficeExten())%>" readonly style="border-color: #ff9999"></td>
+                                <td><input type="text" id="empEmail<%=model.getCompanyUserEmpId()%>" name="empEmail<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserOfficeEmail())%>" readonly style="border-color: #ff9999"></td>
+                                <td><input type="text" id="nextPersonName<%=model.getCompanyUserEmpId()%>" name="nextPersonName<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserContactPersonName())%>" readonly style="border-color: #ff9999"></td>
+                                <td><input type="text" id="nextPersonMobile<%=model.getCompanyUserEmpId()%>" name="nextPersonMobile<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserContactPersonMobile())%>" readonly></td>
+                                <td><input type="text" id="nextPersonExtention<%=model.getCompanyUserEmpId()%>" name="nextPersonExtention<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserContactPersonExten())%>" readonly style="border-color: #ff9999"></td>
+                                <td><input type="text" id="remark<%=model.getCompanyUserEmpId()%>" name="remark<%=model.getCompanyUserEmpId()%>" class="<%=model.getCompanyUserEmpId()%>" value="<%=APPUtills.getString(model.getCompanyUserRemarks())%>" readonly></td>
                                 <td>
                                     <%if (model.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_NEW)) {%>
-                                    <select id="status<%=model.getCompanyUserEmpId()%>" name="status<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled="true">
+                                    <select id="status<%=model.getCompanyUserEmpId()%>" name="status<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled>
                                         <option value="<%=ApplicationConstants.STATUS_ACTIVE%>" selected><%=ApplicationConstants.statusDesc(ApplicationConstants.STATUS_ACTIVE)%></option>
                                     </select>
                                     <%} else {%>
-                                    <select id="status<%=model.getCompanyUserEmpId()%>" name="status<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled="true">
+                                    <select id="status<%=model.getCompanyUserEmpId()%>" name="status<%=model.getCompanyUserEmpId()%>" style="border-color: #ff9999" class="<%=model.getCompanyUserEmpId()%>" disabled>
                                         <option value="<%=ApplicationConstants.STATUS_ACTIVE%>" <%=model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_ACTIVE) ? "selected" : ""%>><%=ApplicationConstants.statusDesc(ApplicationConstants.STATUS_ACTIVE)%></option>
                                         <option value="<%=ApplicationConstants.STATUS_INACTIVE%>" <%=model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE) ? "selected" : ""%>><%=ApplicationConstants.statusDesc(ApplicationConstants.STATUS_INACTIVE)%></option>
                                     </select>

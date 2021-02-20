@@ -59,9 +59,9 @@ public class CommonUserMasterFacade implements CommonUserMasterFacadeLocal{
 		System.out.println("LEFT    | CommonUserMasterFacade.getAllUsers()");
 		return dfumsMap;
 	}
-	/*@Override
-	public Map<Integer, CommonUserModel> getAllUserByUserId(String cmnUserId) throws Exception{
-		System.out.println("ENTERED | CommonUserMasterFacade.getAllUserByMasterId()");
+	@Override
+	public Map<Integer, CommonUserModel> getUserByUserId(String cmnUserId) throws Exception{
+		System.out.println("ENTERED | CommonUserMasterFacade.getUserByUserId()");
 		Map<Integer, CommonUserModel> dfumsMap = new HashMap();
 		List<CommonUserMaster> dfumsList = new ArrayList<>();
 		List<String> recStatusList;
@@ -70,8 +70,8 @@ public class CommonUserMasterFacade implements CommonUserMasterFacadeLocal{
 			session = DbConfig.sessionBulder();
 			tx = session.beginTransaction();
 			
-			query = session.createQuery("FROM CommonUserMaster tmp WHERE tmp.cmnUserId="+cmnUserId);
-
+			query = session.createQuery("FROM CommonUserMaster tmp WHERE tmp.cmnUserId=:cmnUserId");
+			query.setParameter("cmnUserId", cmnUserId);
 			System.out.println("HQL     | " + query.toString());
 			dfumsList = query.list();
 			tx.commit();
@@ -86,9 +86,9 @@ public class CommonUserMasterFacade implements CommonUserMasterFacadeLocal{
 			if (session != null)
 				session.close();
 		}
-		System.out.println("LEFT    | CommonUserMasterFacade.getAllUserByMasterId()");
+		System.out.println("LEFT    | CommonUserMasterFacade.getUserByUserId()");
 		return dfumsMap;
-	}*/
+	}
 
 	public Map<Integer, CommonUserModel> objectToModel(List<CommonUserMaster> dfumsMasterList) throws Exception {
 		System.out.println("ENTERED    | CommonUserMasterFacade.objectToModel()");

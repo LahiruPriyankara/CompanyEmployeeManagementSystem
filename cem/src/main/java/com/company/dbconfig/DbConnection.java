@@ -10,6 +10,7 @@ import com.company.dto.EventLogTbl;
 import com.company.dto.FdUserMaster;
 import com.company.dto.FdUserTmp;
 import com.company.dto.UserReference;
+import com.company.dto.VisitorData;
 
 public class DbConnection {
 	private DbConnection() {
@@ -24,8 +25,11 @@ public class DbConnection {
 	}
 
 	public Configuration getConnection() {
-		return new Configuration().configure().addAnnotatedClass(CompanyUserMaster.class).addAnnotatedClass(CompanyUserTmp.class)
-				.addAnnotatedClass(EventLogTbl.class).addAnnotatedClass(FdUserMaster.class).addAnnotatedClass(FdUserTmp.class).addAnnotatedClass(UserReference.class).addAnnotatedClass(CommonUserMaster.class).addAnnotatedClass(CommonUserTmp.class);
+		return new Configuration().configure().addAnnotatedClass(CompanyUserMaster.class)
+				.addAnnotatedClass(CompanyUserTmp.class).addAnnotatedClass(EventLogTbl.class)
+				.addAnnotatedClass(FdUserMaster.class).addAnnotatedClass(FdUserTmp.class)
+				.addAnnotatedClass(UserReference.class).addAnnotatedClass(CommonUserMaster.class)
+				.addAnnotatedClass(CommonUserTmp.class).addAnnotatedClass(VisitorData.class);
 
 	}
 }

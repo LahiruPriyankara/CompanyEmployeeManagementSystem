@@ -89,8 +89,9 @@
                     <table class="table-bordered table-hover" id="mainTable">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th></th>
                                 <th>IMAGE</th>
+                                <th>ID</th>
                                 <th>NAME</th>
                                 <th>GRADE</th>                            
                                 <th>DIV ID</th>
@@ -100,12 +101,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <%if(model==null){ %>
+                        <%if(model!=null){ %>
                              <tr>
-                                <td colspan="9" style="text-align: center;"> no data found </td>
-                             </tr> 
-                        <%}else{ %>
-                             <tr>
+                               <td><span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/ExistingCommonEntererAuthsDetails')"></span></td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
                                     <img src="data:image/jpg;base64,<%=model.getBase64Image()%>" style="border-radius: 50%;margin-right: 2px" alt="prof pic" width="25" height="25"/>

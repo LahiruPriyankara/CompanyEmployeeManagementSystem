@@ -5,8 +5,6 @@
  */
 package com.company.dao;
 
-import java.util.List;
-
 import com.company.dto.UserReference;
 
 /**

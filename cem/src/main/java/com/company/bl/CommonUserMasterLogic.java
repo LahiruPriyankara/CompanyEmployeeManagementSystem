@@ -56,10 +56,22 @@ public class CommonUserMasterLogic implements CommonUserMasterLogicLocal{
         System.out.println("LEFT    | CommonUserMasterLogic.getAllUsers()");
         return dfumsMap;
 	}
+	public Map<Integer, CommonUserModel> getUserByUserId(String cmnUserId) throws Exception{
+		System.out.println("ENTERED | CommonUserMasterLogic.getUserByUserId()");
+        try {
+            return commonUserMasterFacade.getUserByUserId(cmnUserId);
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | Unable to fetch data." + ex.getMessage());
+            throw new SBLException(ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("ERROR   | Unable to fetch data." + ex.getMessage());
+            throw new SBLException("Unable to fetch data.Please try again.");
+        }
+	}
 
 	@Override
 	public boolean modifyUser(CommonUserModel model, String actionType) throws Exception {
-		 System.out.println("ENTERED | CommonUserMasterLogic.rejectFdUser()");
+		 System.out.println("ENTERED | CommonUserMasterLogic.modifyUser()");
 	        boolean isSuccess = true;
 	        try {
 	            if(actionType.equalsIgnoreCase(ApplicationConstants.PERFORMING_ACTCION_SAVE)){
@@ -79,11 +91,11 @@ public class CommonUserMasterLogic implements CommonUserMasterLogicLocal{
 	            }
 	            
 	        } catch (Exception ex) {
-	            System.out.println("ERROR   | Unable to reject." + ex.getMessage());
+	            System.out.println("ERROR   | Unable to modifyUser." + ex.getMessage());
 	            isSuccess = false;
 	            //throw new SBLException("Unable to reject.Please try again.");
 	        }
-	        System.out.println("LEFT    | CommonUserMasterLogic.rejectFdUser()");
+	        System.out.println("LEFT    | CommonUserMasterLogic.modifyUser()");
 	        return isSuccess;
 	}
 

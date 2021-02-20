@@ -8,6 +8,16 @@ import org.hibernate.service.ServiceRegistryBuilder;
 
 
 public class DbConfig {
+	
+	private DbConfig(){}
+	
+	/*Session session = null;
+	public static Session sessionBulder(){
+		if(session == null)
+			session = createBulder();
+		return session;
+	}
+	*/
 	public static Session sessionBulder(){
         //Configuration con = new Configuration().configure().addAnnotatedClass(User.class).addAnnotatedClass(Vehicle.class).addAnnotatedClass(Book.class);
         Configuration con = DbConnection.getInstance().getConnection();

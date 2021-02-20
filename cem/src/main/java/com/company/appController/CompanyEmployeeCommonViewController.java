@@ -20,15 +20,20 @@ import com.company.common.APPUtills;
 import com.company.common.ApplicationConstants;
 import com.company.common.ObjectManager;
 import com.company.common.SBLException;
+import com.company.dao.VisitorDataFacadeLocal;
+import com.company.dto.VisitorData;
 import com.company.models.CompanyUserModel;
 import com.company.models.UserData;
 
 @Controller
-@ComponentScan(basePackages = {"com.company.bl"})
+@ComponentScan(basePackages = {"com.company.bl","com.company.dao"})
 public class CompanyEmployeeCommonViewController {
 	//private static final Log log = LogFactory.getLog(CompanyEmployeeCommonViewController.class);
 	@Autowired
     private CompanyUserLogicLocal companyUserLogic;
+	
+	@Autowired 
+	VisitorDataFacadeLocal visitorDataFacade;
 	
 	@RequestMapping(value = { "/CommonView/ExistingEmp" })
 	public ModelAndView getAllEmployeeList(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
@@ -127,6 +132,106 @@ public class CompanyEmployeeCommonViewController {
 
         System.out.println("LEFT    | CompanyEmployeeCommonViewController.getEmployeeDetailsForCommonView()");
         return new ModelAndView("commonView/comnViewBankEmployeeDetails");
+	}
+	
+	@RequestMapping(value = { "/CommonView/SaveVisitorDetails" })
+	public void saveVisitorDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+		System.out.println("ENTERED | CompanyEmployeeCommonViewController.saveVisitorDetails()");
+        VisitorData data = new VisitorData();
+        String passId,nicNum,empId;
+        ObjectManager objManager = null;
+        UserData userData = null;
+        try {
+            /*
+            getting CEM record from objManager
+            getting related COM_SERVICE record from COMPANY service (by passing solId)
+             */
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		//return new ModelAndView("includes/include-dashboard");
+        		throw new Exception(result);
+        	}
+        	
+            Map<String, CompanyUserModel> companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
+
+            empId = req.getParameter("id");
+            passId = req.getParameter("passId");
+            nicNum = req.getParameter("nicNum");
+            
+            System.out.println("empId : "+empId+" ,passId : "+passId+" ,nicNum : "+nicNum);
+            
+            if (!APPUtills.isThisStringValid(passId)||!APPUtills.isThisStringValid(nicNum)) {
+                System.out.println("ERROR   | Id is not received.");
+                throw new SBLException("Ids are not received.");
+            }
+
+            data.setCompanyEmpId(empId);
+            data.setVisitorPassId(passId);
+            data.setVisitorNicNum(nicNum);
+            data.setCreatedBy(Integer.parseInt(userData.getUSER_ID()));
+            data.setCreatedDate(APPUtills.getCurrentDate());
+            
+            if(visitorDataFacade.insertRecord(data)){
+            	req.setAttribute("rtnMsg", "Successfully save.");
+            } else{
+            	req.setAttribute("errMsg", "Fail to save the record.");
+            }
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("commonView/comnViewBankEmployee");
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("commonView/comnViewBankEmployee");
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.saveVisitorDetails()");
+        //return new ModelAndView("commonView/comnViewBankEmployee");
+        //return "redirect:/CommonView/ExistingEmp";
+        //return new ModelAndView("includes/include-dashboard");
+	}
+	
+	
+	@RequestMapping(value = { "/CommonView/GetAllVisitorData" })
+	public ModelAndView getAllVisitorData(HttpServletRequest req, HttpServletResponse resp,HttpSession session){
+		System.out.println("ENTERED | CompanyEmployeeCommonViewController.getAllVisitorData()");
+        List<VisitorData> dataList;
+        ObjectManager objManager = null;
+        UserData userData = null;
+        try {
+            /*
+            getting CEM record from objManager
+            getting related COM_SERVICE record from COMPANY service (by passing solId)
+             */
+        	objManager = new ObjectManager(session);
+        	userData = (UserData) objManager.get("userData");
+        	
+        	String result = checkSessionTimeOut(userData,objManager);
+        	if(APPUtills.isThisStringValid(result)){
+        		req.setAttribute("errMsg", result);
+        		return new ModelAndView("includes/include-dashboard");
+        	}
+        	
+        	dataList = visitorDataFacade.getAllRecord();
+        	objManager.put("dataList", dataList, ApplicationConstants.SCOPE_VISITOR_VIEW);
+        
+        } catch (SBLException ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("commonView/comnViewBankEmployee");
+        } catch (Exception ex) {
+            System.out.println("ERROR   | " + ex.getMessage());
+            req.setAttribute("errMsg", ex.getMessage());
+            //return new ModelAndView("commonView/comnViewBankEmployee");
+        }
+
+        System.out.println("LEFT    | CompanyEmployeeCommonViewController.getAllVisitorData()");
+        return new ModelAndView("visitorData/visitorData");
 	}
 	
 	public String checkSessionTimeOut(UserData userData,ObjectManager objManager){
