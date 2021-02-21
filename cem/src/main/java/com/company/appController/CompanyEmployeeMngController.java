@@ -1,6 +1,7 @@
 package com.company.appController;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.company.bl.CompanyUserLogicLocal;
@@ -36,6 +39,8 @@ import com.company.dto.CompanyUserTmp;
 import com.company.models.CompanyUserModel;
 import com.company.models.DivInfo;
 import com.company.models.UserData;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Controller
 @ComponentScan(basePackages = {"com.company.bl"})
@@ -564,7 +569,7 @@ public class CompanyEmployeeMngController {
 //-------------------------------------------------------------------------------------------------------------------------------------	
 	
 	@RequestMapping(value = { "CompanyEmployee/SaveSingleEmp"})
-	public String saveSingleEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+	public String saveSingleEmp(MultipartHttpServletRequest req, HttpServletResponse resp,HttpSession session){	
 		System.out.println("ENTERED | CompanyEmployeeMngController.saveSingleEmp()");
         ObjectManager objManager = null;
         UserData userData;
@@ -595,7 +600,7 @@ public class CompanyEmployeeMngController {
 	}
 	
 	@RequestMapping(value = { "/CompanyEmployee/SaveBulkEmp"})
-	public ModelAndView saveBulkEmp(@RequestParam("files") MultipartFile files[],HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
+	public ModelAndView saveBulkEmp(MultipartHttpServletRequest req, HttpServletResponse resp,HttpSession session){	
 		System.out.println("ENTERED | CompanyEmployeeMngController.saveBulkEmp()");
         ObjectManager objManager = null;
         UserData userData;
@@ -607,26 +612,20 @@ public class CompanyEmployeeMngController {
         	if(APPUtills.isThisStringValid(result)){
         		throw new Exception(result);
         	}
-        	//saveEmployeeDetails(objManager, userData, true, req);
-        	
+        	/*
+            @RequestParam("files") MultipartFile files[]
         	System.out.println("files.length : "+files.length);
         	
-        	
-        	Part filePart = req.getPart("profPicTEST_USER10");
-            System.out.println("MESSAGE |  filled object => filePart : " + filePart);
-            String fileName = getFileName(filePart);
-            if (APPUtills.isThisStringValid(fileName)) {
-                if (!isValidFileType(fileName)) {
-                    throw new SBLException("Please upload a valid file(PNG or JPEG).");
-                }
-                InputStream filecontent = filePart.getInputStream();
-
-                byte[] fileAsByteArray = new byte[1048576];
-                filecontent.read(fileAsByteArray);
-
-                //model.setCompanyUserProfImg(fileAsByteArray);
-            }
-            
+        	for (MultipartFile file : files) {
+    			if (!file.isEmpty()) {
+    				System.out.println("files.length : "+file);
+    				
+    			} else {
+    				System.out.println("EMPTY..............");
+    			}
+    		}
+        	*/
+        	saveEmployeeDetails(objManager, userData, true, req);
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
@@ -644,7 +643,7 @@ public class CompanyEmployeeMngController {
 		
 	}	
 		
-	private void saveEmployeeDetails(ObjectManager objManager, UserData userData, boolean isBulk, HttpServletRequest req) throws SBLException {
+	private void saveEmployeeDetails(ObjectManager objManager, UserData userData, boolean isBulk, MultipartHttpServletRequest req) throws SBLException {
        System.out.println("ENTERED | CompanyEmployeeCommonViewController.saveEmployeeDetails()");
         CompanyUserModel model;
         List<CompanyUserModel> companyUserModels = new ArrayList();
@@ -751,8 +750,8 @@ public class CompanyEmployeeMngController {
             }
 
             //eventAction = "";
-            //eventDesc = "Save bank user in temp table.";
-            //EventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", "", "", ApplicationConstants.EVENTSUCCESSFUL);
+            eventDesc = "Save bank user in temp table.";
+            eventLogger.doLog(req, String.valueOf(userData.getUSER_ID()), ApplicationConstants.BANK_EMPLOYEE, eventAction, eventDesc + "Successful. ", "", "", ApplicationConstants.EVENTSUCCESSFUL);
             req.setAttribute("rtnMsg", "Successfully save.");
             
             System.out.println("Going to fetch all existing data....");
@@ -1024,7 +1023,7 @@ public class CompanyEmployeeMngController {
 //-------------------------------------------------------------------------------------------------------------------------------------	
 
 
-	private boolean validateFieldsFillData(String empId, boolean isBulk, HttpServletRequest req) throws SBLException {
+	private boolean validateFieldsFillData(String empId, boolean isBulk, MultipartHttpServletRequest req) throws SBLException {
        System.out.println("ENTERED | CompanyEmployeeMngController.validateFields()");
         String errorStrg = "";
         boolean isValid = false;
@@ -1114,7 +1113,7 @@ public class CompanyEmployeeMngController {
         return isValid;
     }
 
-    private CompanyUserModel fillObject(CompanyUserModel model, boolean isBulk, HttpServletRequest req) throws SBLException {
+    private CompanyUserModel fillObject(CompanyUserModel model, boolean isBulk, MultipartHttpServletRequest req) throws SBLException {
        System.out.println("ENTERED | CompanyEmployeeMngController.fillObject()");
         try {
             /*
@@ -1126,6 +1125,41 @@ public class CompanyEmployeeMngController {
                 throw new SBLException("Null Object.");
             }
             String empId = model.getCompanyUserEmpId();
+            
+            //System.out.println("MESSAGE |  filled object => filePart1 : " + req.getFile("profPicTEST_USER10"));
+        	//System.out.println("MESSAGE |  filled object => filePart2 : " + req.getParameter("mNameTEST_USER10"));        	
+        	
+        	MultipartFile filePart = req.getFile("profPic" + empId);
+        	//System.out.println("MESSAGE |  filled object => filePart : " + filePart.getBytes());
+            //System.out.println("MESSAGE |  filled object => profPic" + empId);
+            //System.out.println("MESSAGE |  filled object => filePart : " + filePart);
+             
+        	System.out.println("MESSAGE |  filePart.getSize() : " + filePart.getSize());
+        	
+             if(filePart.getSize()>0){
+            	 
+            	 if(filePart.getSize() > 26200){
+            		 throw new SBLException("Image is too large.Please upload a image bellow 26 KB.");
+            	 }
+            	 
+            	 String fileName = filePart.getContentType().split("/")[1];
+                 System.out.println("MESSAGE |  fileName : " + fileName);
+                 if (APPUtills.isThisStringValid(fileName)) {
+                	 fileName = fileName.toLowerCase();
+                     if (!fileName.equalsIgnoreCase("jpg")&&!fileName.equalsIgnoreCase("jpeg")&&!fileName.equalsIgnoreCase("png")) {
+                         throw new SBLException("Please upload a valid file(PNG or JPEG).");
+                     }
+                     //InputStream filecontent = filePart.getInputStream();
+
+                     //byte[] fileAsByteArray = new byte[1048576];
+                     //filecontent.read(fileAsByteArray);
+
+                     //model.setCompanyUserProfImg(filePart.getBytes());
+                     model.setCompanyUserProfImg(filePart.getBytes());
+                     System.out.println("ADDED...........................");
+                 }
+             }
+            
 /*
             Part filePart = req.getPart("profPic" + empId);
             System.out.println("MESSAGE |  filled object => profPic" + empId);

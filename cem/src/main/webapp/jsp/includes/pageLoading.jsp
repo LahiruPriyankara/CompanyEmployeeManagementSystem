@@ -9,5 +9,5 @@
  -->
  
  <div id="loaderDiv">    
-    <div id="loaderText"><img alt="plusMark" width="170" height="170" src="${images}/pageLoading2.gif"/></div>
+    <div id="loaderText"><img alt="plusMark" width="100" height="100" src="${images}/pageLoading2.gif"/></div>
 </div>

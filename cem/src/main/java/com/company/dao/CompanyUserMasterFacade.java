@@ -119,10 +119,10 @@ public class CompanyUserMasterFacade implements CompanyUserMasterFacadeLocal {
         int id = 0;
         try {
         	session = DbConfig.sessionBulder();  
-            tx = session.beginTransaction();
+            
             System.out.println("MESSAGE | CompanyUserModelList.size() : "+CompanyUserModelList.size());
             for (CompanyUserModel CompanyUserModel : CompanyUserModelList) {
-
+            	tx = session.beginTransaction();
                 if (CompanyUserModel.getActionType().equalsIgnoreCase(ApplicationConstants.ACTION_TYPE_MODIFY)) {
                     System.out.println("MESSAGE | EDIT => Saving modify record : " + CompanyUserModel.toString());
                     session.update((CompanyUserMaster) CompanyUserModel.modelToObject(ApplicationConstants.MASTER_DATA));
@@ -138,9 +138,9 @@ public class CompanyUserMasterFacade implements CompanyUserMasterFacadeLocal {
                     session.save((CompanyUserMaster) CompanyUserModel.modelToObject(ApplicationConstants.MASTER_DATA));
                    
                 }
-
+                tx.commit();
             }
-            tx.commit();
+           
             isSuccess = true;
         } catch (Exception ex) {
             //context.setRollbackOnly();

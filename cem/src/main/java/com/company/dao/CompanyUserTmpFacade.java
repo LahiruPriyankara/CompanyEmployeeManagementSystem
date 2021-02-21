@@ -119,9 +119,10 @@ public class CompanyUserTmpFacade implements CompanyUserTmpFacadeLocal {
         int id = 0;
         try {
         	session = DbConfig.sessionBulder();  
-            tx = session.beginTransaction();
+            //tx = session.beginTransaction();
             
             for (CompanyUserModel CompanyUserModel : CompanyUserModelList) {
+            	tx = session.beginTransaction();
                 CompanyUserModel.setModifiedBy(Integer.parseInt(userData.getUSER_ID()));
                 CompanyUserModel.setModifiedDate(APPUtills.getCurrentDate());
                 CompanyUserModel.setRecStatus(ApplicationConstants.RECORD_STATUS_PENDING);
@@ -143,9 +144,9 @@ public class CompanyUserTmpFacade implements CompanyUserTmpFacadeLocal {
                     session.update((CompanyUserTmp) CompanyUserModel.modelToObject(ApplicationConstants.TEMP_DATA));
                     
                 }
-
+                tx.commit();
             }
-            tx.commit();
+            //tx.commit();
             isSuccess = true;
         } catch (Exception ex) {
             //context.setRollbackOnly();

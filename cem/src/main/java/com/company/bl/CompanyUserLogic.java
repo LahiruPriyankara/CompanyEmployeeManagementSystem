@@ -78,11 +78,11 @@ public class CompanyUserLogic implements CompanyUserLogicLocal {
         try {
             Map<String, CompanyUserModel> userMap = companyUserTmpFacade.getTempCompanyUsers(ids, userData.getDIV_CODE());//Pending OR Reject
 
-           /* for (CompanyUserModel bankUserModel : bankUserModelList) {
-                if (userMap.get(bankUserModel.getBankUserEmpId()) != null && userMap.get(bankUserModel.getBankUserEmpId()).getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING) ) {
-                    errorCode = errorCode.equalsIgnoreCase("") ? bankUserModel.getBankUserEmpId() : errorCode + "," + bankUserModel.getBankUserEmpId();
+           for (CompanyUserModel bankUserModel : bankUserModelList) {
+                if (userMap.get(bankUserModel.getCompanyUserEmpId()) != null && userMap.get(bankUserModel.getCompanyUserEmpId()).getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING) ) {
+                    errorCode = errorCode.equalsIgnoreCase("") ? bankUserModel.getCompanyUserEmpId() : errorCode + "," + bankUserModel.getCompanyUserEmpId();
                 }
-            }*/
+            }
             if (APPUtills.isThisStringValid(errorCode)) {
                 dedLog.error("ERROR   | Bellow records are already pending for this department." + errorCode);
                 throw new SBLException("Bellow records are already pending for this department.<br>(" + errorCode+")");

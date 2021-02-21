@@ -40,9 +40,7 @@
 <%@include file="../includes/include-initial-variables.jsp"%>
 </head>
 <%
-	boolean isPswdReset = objManager.get("isPswdReset") != null
-			? (boolean) objManager.get("isPswdReset")
-			: false;
+	boolean isPswdReset = objManager.get("isPswdReset") != null ? (boolean) objManager.get("isPswdReset") : false;
 %>
 <body
 	style="background-image: url('${images}/logginPageBackGround1.jpg');">
@@ -50,10 +48,9 @@
 		<div class="row" style="margin-top: 1%;">
 			<div class="col-sm-2 col-md-2"></div>
 
-			<div class="col-sm-8 col-md-8"
-				style="background: rgba(255, 255, 255, 0.5); margin-top: 2%;border-radius: 10px">
+			<div class="col-sm-8 col-md-8" style="background: rgba(255, 255, 255, 0.5); margin-top: 2%;border-radius: 10px">
 
-				<div class="row" style="background-color: #1a8cff;margin: 2%;padding:5px">
+				<div class="row" style="background-color: #1a8cff;margin: 1%;padding:3px">
 					<div class="col-sm-3 col-md-3">
 						<img alt="plusMark" width="170" height="170" src="${images}/compayLogo.png" />
 					</div>
