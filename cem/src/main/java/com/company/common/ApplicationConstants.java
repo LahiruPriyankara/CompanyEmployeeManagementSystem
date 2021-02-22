@@ -82,13 +82,13 @@ public class ApplicationConstants {
     public final static String ERR_MSG_VALUES_ARE_SAME = "Please do some change.";
 
     // System user roles
-    public static String USER_ROLE_SUPER_ENTERER = "1";            // Authorizer : To frontdesk user management 
-    public static String USER_ROLE_SUPER_AUTHORIZER = "2";         // Enterer : To frontdesk user management 
-    public static String USER_ROLE_COMMON_ENTERER = "3";           // Authorizer : To any user management 
-    public static String USER_ROLE_COMMON_AUTHORIZER = "4";    // Enterer : To any user management 
-    public static String USER_ROLE_ENTERER = "5";           // Authorizer : To department user management 
-    public static String USER_ROLE_AUTHORIZER = "6";       // Enterer : To department user management 
-    public static String USER_ROLE_INVALID = "0";            // Invalid user role        
+    public static String USER_ROLE_COMPANY_VIWER = "0";           // 
+    public static String USER_ROLE_COMMON_ENTERER = "1";           // Authorizer : To any user management 
+    public static String USER_ROLE_COMMON_AUTHORIZER = "2";    // Enterer : To any user management 
+    public static String USER_ROLE_BRANCH_ENTERER = "3";           // Authorizer : To department user management 
+    public static String USER_ROLE_BRANCH_AUTHORIZER = "4";       // Enterer : To department user management 
+    public static String USER_ROLE_FD_USER = "5";       // Front desk user 
+    //public static String USER_ROLE_INVALID = "0";            // Invalid user role        
 
     //Tab header ids
     public final static String APP_DASH_BOARD = "APP_DASH_BOARD";

@@ -44,8 +44,8 @@
     <thead>
         <tr>
             <th style="width: 30%"></th>
-            <th style="width: 35%">DVM</th> 
-            <th style="width: 35%">UPM</th> 
+            <th style="width: 35%">CEM</th> 
+            <th style="width: 35%">COM SERVICE</th> 
         </tr>
     </thead>
     <tbody> 
@@ -85,12 +85,12 @@
             <td></td>
         </tr>
         <tr>                            
-            <td style="<%if (!APPUtills.isEqual(modelFromDVM.getCompanyUserDivId(),modelFromUPM.getCompanyUserDivId())) {%>background-color: #ffad99<%}%>"><b>SOL ID</b></td>
+            <td style="<%if (!APPUtills.isEqual(modelFromDVM.getCompanyUserDivId(),modelFromUPM.getCompanyUserDivId())) {%>background-color: #ffad99<%}%>"><b>DEPARTMENT ID</b></td>
             <td><%=APPUtills.getString(modelFromDVM.getCompanyUserDivId())%></td>
             <td style='color: #3399ff'><%=APPUtills.getString(modelFromUPM.getCompanyUserDivId())%></td>
         </tr>
         <tr>                            
-            <td style="<%if (!APPUtills.isEqual(modelFromDVM.getCompanyUserDepName(),modelFromUPM.getCompanyUserDepName())) {%>background-color: #ffad99<%}%>"><b>DEP NAME</b></td>
+            <td style="<%if (!APPUtills.isEqual(modelFromDVM.getCompanyUserDepName(),modelFromUPM.getCompanyUserDepName())) {%>background-color: #ffad99<%}%>"><b>DEPARTMENT NAME</b></td>
             <td><%=APPUtills.getString(modelFromDVM.getCompanyUserDepName())%></td>
             <td style='color: #3399ff'><%=APPUtills.getString(modelFromUPM.getCompanyUserDepName())%></td>
         </tr>

@@ -92,8 +92,7 @@
 									<hr>
 									<div class="custom-control custom-switch">
 										<input type="checkbox" name="cBoxuserType" checked="true">
-										<label class="custom-control-label" for="switch1">Bank
-											User</label>
+										<label class="custom-control-label" for="switch1">Company User</label>
 									</div>
 									<div class="form-group text-center">
 										<input type="text" id="txtUserId" name="txtUserId"
@@ -157,24 +156,22 @@
 							<br>
 						</div>
 
-						<div class="row" style="margin-top: 1%;">
-							<%if (isPswdReset) {%>
-							<br>
-							<div style="text-align: center;">
-								<p> <i>The length of the Passwords must be between 8 and 15 characters</i> </p>
-								<p> <i>There has to be at least one upper case character in the Password i.e. A, B . . . Y, Z</i> </p>
-								<p> <i>There has to be at least one lower case character in the Password i.e. a, b . . . y, z</i> </p>
-								<p> <i>There has to be at least one number in the Password i.e. 1, 2 . . . 9, 0</i> </p>
-								<p> <i>There has to be at least one special character in the Password i.e. ` ~ ! @ # $ % ^ & * ( ) _ + = - [ ] { } ; : ’ ” , < > . > / ?</i> </p>
-								<p> <i>There cannot be more than 2 consecutive repeated characters i.e. xx is allowed but xxx is not allowed</i> </p>
-							</div>
-							<%}%>
-						</div>
-
 					</div>
 					<div class="col-sm-3 col-md-3"></div>
 				</div>
-
+				<div class="row" style="margin-top: 1%;">
+					<%if (isPswdReset) {%>
+						<br>
+						<div style="text-align: center;">
+							<p> <i>The length of the Passwords must be between 8 and 15 characters</i> </p>
+							<p> <i>There has to be at least one upper case character in the Password i.e. A, B . . . Y, Z</i> </p>
+							<p> <i>There has to be at least one lower case character in the Password i.e. a, b . . . y, z</i> </p>
+							<p> <i>There has to be at least one number in the Password i.e. 1, 2 . . . 9, 0</i> </p>
+							<p> <i>There has to be at least one special character in the Password i.e. ` ~ ! @ # $ % ^ & * ( ) _ + = - [ ] { } ; : ’ ” , < > . > / ?</i> </p>
+							<p> <i>There cannot be more than 2 consecutive repeated characters i.e. xx is allowed but xxx is not allowed</i> </p>
+						</div>
+					<%}%>
+				</div>
 
 				<div class="row" style="margin-top: 1%;">
 					<br><br><br>

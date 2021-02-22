@@ -199,8 +199,8 @@ public class CompanyEmployeeAuthenticate {
                     System.out.println("MESSAGE | userData.toString() "+userData.toString());
                 }
                 //getting logged user details from cem system databasee.	---------------------------------------------
-                Map<String, CompanyUserModel> dfumsMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(userData.getUSER_ID()), null);//String tableType, List<String> ids, String depCode               
-                CompanyUserModel model = dfumsMap.get(userData.getUSER_ID());                
+                Map<String, CompanyUserModel> dfumsMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(userData.getAD_USER_ID()), null);//String tableType, List<String> ids, String depCode               
+                CompanyUserModel model = dfumsMap.get(userData.getAD_USER_ID());                
                 userData.setBase64Image(model!=null?model.getBase64Image():"");
                 userData.setUSER_TYPE(ApplicationConstants.BANK_EMPLOYEE);
             }else{
