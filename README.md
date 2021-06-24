@@ -23,7 +23,7 @@ In the CEM_SERVICE project, you can see three files.
 					
 					
 
-
+http://localhost:8080/cem/authonticate
 
 
 
