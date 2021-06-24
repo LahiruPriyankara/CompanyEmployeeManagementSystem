@@ -1,10 +1,8 @@
 # CompanyEmployeeManagementSystem
-Spring project with java 8 to manage the company employees
 
-This project is create with java 8.
-There are 2 projects.
+There are 2 projects with java 8.
                     - CEM_SERVICE - spring boot rest service
-					- cem - spring full stack web project.(company employee management)
+					- cem - spring full stack web project.(company employee management, Spring-maven project with java 8 to manage the company employees).
 
 CEM_SERVICE project - To handle the all the basic employee data.
                     - This is a spring boot project.
@@ -20,7 +18,7 @@ cem					- This is a Spring web project.
 					- cem database => CUD_DATABASE
 
 In the CEM_SERVICE project, you can see three files.
-                    01. prjData_1.txt  02. prjData_2.txt  03. query.sql
+                    01. prjData_1.txt | 02. prjData_2.txt | 03. query.sql
 					prjData_1.txt -Contains CEM_SERVICE testing URLs and user’s logging credentials to log completed application.
 					
 					
