@@ -1,0 +1,176 @@
+NOW I AM GOING TO TEST COMPANY WEB SERVICE
+      NOTE: All the URLs which I am using here are provided in description..
+
+
+
+//SERVICE TEST URL
+http://localhost:8000/company/test
+
+//GETTING ALL COMPANY EMPLOYEES
+http://localhost:8000/company/allDepartments
+
+
+
+...........................................FRONT DESK USER....................................................
+
+//GETTING ALL FRONT DESK USERs
+http://localhost:8000/company/allNonCompanyUsers
+
+//CREATE A NEW FRONT DESK USER
+http://localhost:8000/company/createNonCompanyUser/{userId}          // http://localhost:8000/company/createNonCompanyUser/bandaraK
+
+//VERIFY A NEW FRONT DESK USER
+http://localhost:8000/company/verifyNonCompanyUser/{userId}         //http://localhost:8000/company/verifyNonCompanyUser/bandaraK
+
+//SET A PASSWORD TO FRONT DESK USER
+http://localhost:8000/company/setPasswordNonCompanyUser/{userId}/{newPassword}  // http://localhost:8000/company/setPasswordNonCompanyUser/bandaraK/Abc@1234
+
+//AFTER SETTING A PASSWORD, THEN FRONT DESK USER SHOULD BE ACTIVATED
+http://localhost:8000/company/activePasswordNonCompanyUser/{userId}     //http://localhost:8000/company/activePasswordNonCompanyUser/bandaraK
+
+//THEN FRONT DESK USER CAN LOG
+http://localhost:8000/company/loginNonCompanyUser/{userId}/{password}  //http://localhost:8000/company/loginNonCompanyUser/bandaraK/Abc@1234
+
+BUT,IF USER ENTERS INVALID PASSWORD 5 TIMES, THEN USER WILL BE LOCK....
+
+
+//TO UNLOCK FRONT DESK USER
+http://localhost:8000/company/unlockPasswordNonCompanyUser/{userId}   //http://localhost:8000/company/unlockPasswordNonCompanyUser/bandaraK
+
+//TO RESET FRONT DESK USER PASSWORD
+http://localhost:8000/company/resetPasswordNonCompanyUser/{userId}/{newPassword}  //http://localhost:8000/company/resetPasswordNonCompanyUser/bandaraK/Abc@1234
+
+THEN I WILL GO TO LOG AGAIN.......
+//http://localhost:8000/company/loginNonCompanyUser/bandaraK/Abc@1234
+
+
+
+
+
+...........................................COMPANY USER....................................................
+
+//GETTING ALL COMPANY USERS
+http://localhost:8000/company/allCompanyUsers
+
+//GETTING COMPANY EMPLOYEE BY DEPARTMENT ID (FOR 920 DEPARTMENT ID)
+http://localhost:8000/company/companyUsersByDepId/{depId}   //http://localhost:8000/company/companyUsersByDepId/920
+
+//GETTING COMPANY EMPLOYEE BY USER ID  (FOR LAHIRUP USER ID)
+http://localhost:8000/company/companyUsersByUserId/{userId}  //http://localhost:8000/company/companyUsersByUserId/LAHIRUP
+
+//ASSIGN A ROLE TO A COMPANY USER
+http://localhost:8000/company/companyUsersAssignCommonAdminAuthRole/{userId}/{role} //http://localhost:8000/company/createCompanyUsersByUserRole/TEST_USER9/1
+
+//LOGGIN COMPANY USER
+http://localhost:8000/company/loginCompanyUser/{userId}/{password}  //http://localhost:8000/company/loginCompanyUser/TEST_USER11/Abc@1234
+
+
+.....................................................................................................
+
+
+
+
+
+
+
+
+======================= CREATE FRONT DESK USER =============================
+
+01.Logging as a common enter.
+
+02.Create a Front desk user.
+		NOTE: Front desk user creation is only allow for common enter.
+		
+03.Log as common admin and authorize or reject the record.
+		NOTE: Authorization and rejection process are only allow for common enter.
+              Comment is mandatory – reject
+              Comment is mandatory – verify
+			
+04.If it is verified, it can be seen at master table.
+
+05.If it is rejected, Common enterer can again modify and sent it to authorization
+			OR
+   He can delete the deleted.
+        NOTE: Those process are only allow for common enterer.
+
+06.Front desk user should be set his password using the username created by common enterer.
+
+07.That password is should be sent for authorization. Only common enterer can do that action.
+
+08. Now, Common enterer can authorize that password.
+
+09. Now, Front desk user can log in to the system......................
+
+
+
+----------------------------------------------------------------------------------------------------
+======================= COMPANY EMPLOYEE MANAGEMENT - BRANCH WISE =============================
+
+NOTE: The Common Enterer should be able to modify and resubmit an employee profile rejected by a Department Authorizer.
+      The Common Authorizer should be able to authorize or reject an employee profile created/modified by the Department Enterer.
+
+
+01.Log as department enterer.
+
+02.All the employees who are belongs to logged user’s department  can be seen.
+
+03. Do some modification and send it to authorization. 
+		NOTE: That action can be done only for department enterer(Can not do fo department authorizer OR common authorizer ).
+
+04. Department authorizer can authorize or reject the record.
+		NOTE: Authorization and rejection process are not allow for department enter.
+					Comment is mandatory – reject
+					Comment is mandatory – verify
+					
+05.If it is rejected, department enterer can remodify and send it to authorization
+				OR
+   He can delete the deleted.
+		NOTE: Those process are only allow for department enterer(not for department authorizer).
+		
+
+06.If department authorizer verify the record, then that changes has been applied and changed record can be seen at master table of that department.
+
+
+----------------------------------------------------------------------------------------------------
+======================= COMPANY EMPLOYEE MANAGEMENT - NOT BRANCH WISE ==============================
+NOTE: The Common Enterer should be able to modify and resubmit an employee profile rejected by a Department Authorizer.
+      The Common Authorizer should be able to authorize or reject an employee profile created/modified by the Department Enterer.
+
+01.Log as common enterer.
+
+02. Any the employee's details can be taken based on the given filter condition and he can do some change and can be send it to authorization
+		NOTE: That action can be done only for common enterer(Can not do for common authorizer).
+
+
+
+04. Department common can authorize or reject any pending record.
+		NOTE: Authorization and rejection process are not allow for common enter.
+					Comment is mandatory – reject
+					Comment is mandatory – verify
+					
+05.If it is rejected, common enterer can remodify and send it to authorization
+				OR
+   He can delete the deleted.
+		NOTE: Those process are only allow for common enterer(not for common authorizer).
+		
+
+06.If common authorizer verify the record, then that changes has been applied and changed record can be seen at master table of related department.
+
+NOW I AM GOING TO CREATE A COMMON ADMIN AUTHORIZER.........................
+This process is also same as above process
+
+
+NOW I AM GOING TO SAVE VISITORS DATA.......................
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,120 @@
+priyankaraggl@gmail.com
+11110000*Lhu
+
+01.run command prompt as administrator
+
+02.go to the directory which contains your jar file
+
+C:\Windows\system32>cd/
+
+C:\>cd oracleweblogic
+
+
+03.Set JAVA_HOME and path again on the command prompt
+
+//put path in double quotes otherwise it won't recognize variable
+
+C:\oracleweblogic>set JAVA_HOME="C:\Program Files\Java\jdk1.8.0_161"
+
+C:\oracleweblogic>set path=C:\Program Files\Java\jdk1.8.0_161\bin;%path%
+If you have already set the JAVA_HOME then in the second step you can also type as: C:\oracleweblogic>set path=%JAVA_HOME%\bin;%path%
+
+04.run the jar file
+
+C:\oracleweblogic>java -jar fmw_12.2.1.1.0_wls_quick.jar
+C:\oracleweblogic>java -jar fmw_12.2.1.3.0_wls.jar
+
+
+
+C:\Oracle\Middleware\Oracle_Home\user_projects\domains\base_domain
+username:weblogic
+password:weblogic123
+http://desktop-9gbkt2r:7001/console
+C:\Oracle\Middleware\Oracle_Home\user_projects\domains\base_domain
+
+
+
+
+http://localhost:8000/company/test
+http://localhost:8000/company/allDepartments
+
+http://localhost:8000/company/allNonCompanyUsers
+http://localhost:8000/company/createNonCompanyUser/{userId}
+http://localhost:8000/company/verifyNonCompanyUser/{userId}
+http://localhost:8000/company/setPasswordNonCompanyUser/{userId}/{newPassword}
+http://localhost:8000/company/activePasswordNonCompanyUser/{userId}
+http://localhost:8000/company/unlockPasswordNonCompanyUser/{userId}
+http://localhost:8000/company/resetPasswordNonCompanyUser/{userId}/{newPassword}
+http://localhost:8000/company/loginNonCompanyUser/{userId}/{password}
+
+http://localhost:8000/company/allCompanyUsers
+http://localhost:8000/company/companyUsersByDepId/{depId}
+http://localhost:8000/company/companyUsersByUserId/{userId}
+http://localhost:8000/company/createCompanyUsersByUserRole/{userId}/{roleId}
+http://localhost:8000/company/companyUsersAssignCommonAdminAuthRole/{userId}/{role}
+http://localhost:8000/company/loginCompanyUser/{userId}/{password}
+
+--- FROND DESK USER CREATION
+	01. CREATE FRONT DESK USER
+	02. VERIFY USER
+	03. SET PASSWORD
+	04. PASSWORD SEND FOR AUTHORIZATION
+	05. PASSWORD VERIFY
+
+.................................................................................................
+
+
+
+
+
+
+
+USERNAME .   PASSWORD . DEPARTMENT       .  ROLE
+--------------------------------------------
+LAHIRUP  .  Abc@1234  . IT Department    . 1
+MADHURAH .  Abc@1234  . Audit Department . 3
+MENAKAJ  .  Abc@1234  . HR Department    . 4
+
+
+In my demonstration, mistakenly I have use users like this...................................
+
+USERNAME   PASSWORD    ROLE D                 EPARTMENR 
+.............................................................
+LAHIRUP     Abc@1234  2   COMMON AUTHORIZER   IT Department     
+TEST_USER1  Abc@1234  1   COMMON ENERER       IT Department   
+TEST_USER2  Abc@1234  2   COMMON AUTHORIZER   IT Department 
+
+
+But that one should be correct as bellow…..
+
+USERNAME   PASSWORD    ROLE D                 EPARTMENR 
+.............................................................    
+TEST_USER1  Abc@1234  1   COMMON ENERER       IT Department   
+TEST_USER2  Abc@1234  2   COMMON AUTHORIZER   IT Department   
+    
+TEST_USER3  Abc@1234  3   BRANCH ENERER       IT Department     
+TEST_USER4  Abc@1234  4   BRANCH AUTHORIZER   IT Department 
+TEST_USER5  Abc@1234  0   VIWERER             IT Department    
+  
+TEST_USER19 Abc@1234  3   BRANCH ENERER       Audit Department  
+TEST_USER20 Abc@1234  4   BRANCH AUTHORIZER   Audit Department
+TEST_USER21 Abc@1234  0   BRANCH VIWERER      Audit Department
+  
+TEST_USER32 Abc@1234  3   BRANCH ENERER       HR Department                       
+TEST_USER33 Abc@1234  4   BRANCH AUTHORIZER   HR Department  
+TEST_USER34 Abc@1234  0   BRANCH VIWERER      HR Department  
+
+NIMALK     Abc@1234  5   FRONT DESK USER
+AMALT     Abc@1234  5   FRONT DESK USER
+
+
+All the project and documents which I have used have been uploaded to gitHub and URL is given in the description.
+
+THANK YOU.......
+
+
+
+
+
+
+
