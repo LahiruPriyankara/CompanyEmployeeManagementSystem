@@ -1,3 +1,7 @@
+/* 
+    Author     : lahiru priyankara
+*/
+
 package com.company.dbconfig;
 
 import org.hibernate.Session;

@@ -88,7 +88,25 @@ public class ApplicationConstants {
     public static String USER_ROLE_BRANCH_ENTERER = "3";           // Authorizer : To department user management 
     public static String USER_ROLE_BRANCH_AUTHORIZER = "4";       // Enterer : To department user management 
     public static String USER_ROLE_FD_USER = "5";       // Front desk user 
-    //public static String USER_ROLE_INVALID = "0";            // Invalid user role        
+    //public static String USER_ROLE_INVALID = "0";            // Invalid user role   
+    
+    
+    public static String getRoleDesc(String role){
+    	if(role.equalsIgnoreCase(USER_ROLE_COMPANY_VIWER))
+    		return "COMPANY_VIWER";
+    	if(role.equalsIgnoreCase(USER_ROLE_COMMON_ENTERER))
+    		return "COMMON_ENTERER";
+    	if(role.equalsIgnoreCase(USER_ROLE_COMMON_AUTHORIZER))
+    		return "COMMON_AUTHORIZER";
+    	if(role.equalsIgnoreCase(USER_ROLE_BRANCH_ENTERER))
+    		return "BRANCH_ENTERER";
+    	if(role.equalsIgnoreCase(USER_ROLE_BRANCH_AUTHORIZER))
+    		return "BRANCH_AUTHORIZER";
+    	if(role.equalsIgnoreCase(USER_ROLE_FD_USER))
+    		return "FD_USER";
+    	
+    	return "NONE";
+    }
 
     //Tab header ids
     public final static String APP_DASH_BOARD = "APP_DASH_BOARD";

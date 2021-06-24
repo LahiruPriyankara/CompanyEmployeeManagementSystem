@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.company.models;
 
 import java.io.IOException;
@@ -16,10 +12,9 @@ import com.company.common.SBLException;
 import com.company.dto.CompanyUserMaster;
 import com.company.dto.CompanyUserTmp;
 
-/**
- *
- * @author sits_lahirupr
- */
+/* 
+Author     : lahiru priyankara
+*/
 public class CompanyUserModel implements Cloneable {
 
     @Override

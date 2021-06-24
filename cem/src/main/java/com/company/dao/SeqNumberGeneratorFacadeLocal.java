@@ -1,3 +1,7 @@
+/* 
+    Author     : lahiru priyankara
+*/
+
 package com.company.dao;
 
 public interface SeqNumberGeneratorFacadeLocal {

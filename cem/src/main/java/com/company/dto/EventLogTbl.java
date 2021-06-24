@@ -22,10 +22,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author sits_lahirupr
- */
+/* 
+Author     : lahiru priyankara
+*/
 @Entity
 @Table(name = "CUD_EVENT_LOG_TBL")
 public class EventLogTbl implements Serializable {

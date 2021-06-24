@@ -1,7 +1,5 @@
 <%-- 
-    Document   : include-body
-    Created on : Dec 21, 2020, 3:35:15 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@page import="com.company.models.CommonUserModel"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -56,15 +54,17 @@
                             <td style="text-align: right">
                                  <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCmnUserTmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/PendingCommonEntererAuthsDetals')"></span>
                                 
-                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING)) {%>
-                                <span class="glyphicon glyphicon-remove cancelIcon" style="color: #800000;" onclick="rejectChanges('<%=model.getCmnUserTmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/RejectCommonEneterAuth')"></span>
-                                <%}%>
-                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)) {%>
+                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING)) {
+                                	if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)){ %>
+                                    <span class="glyphicon glyphicon-remove cancelIcon" style="color: #800000;" onclick="rejectChanges('<%=model.getCmnUserTmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/RejectCommonEneterAuth')"></span>
+                                  	<span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyOrDelete('<%=model.getCmnUserTmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/VerifyCommonEneterAuth')"></span>
+                                   <%}
+                                }%>
+                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)) {
+                                	if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER)){%>
                                 <span class="glyphicon glyphicon-trash removeIcon" style="color: #e62e00;" onclick="verifyOrDelete('<%=model.getCmnUserTmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/deleteCommonEneterAuth')"></span>
-                                <%}%>
-                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING)) {%>
-                                <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyOrDelete('<%=model.getCmnUserTmpId()%>', '<%=sURLPrefix%>/CommonEntererAuth/VerifyCommonEneterAuth')"></span>
-                               <%}%>
+                                <%}
+                                }%>
                             </td>
                             
                             <td><%=APPUtills.getString(model.getCmnUserId())%></td>

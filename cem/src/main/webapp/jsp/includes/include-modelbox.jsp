@@ -1,7 +1,5 @@
 <%-- 
-    Document   : include-modelbox
-    Created on : Dec 21, 2020, 3:38:39 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 
 <div class="modal fade" id="myModal" role="dialog">

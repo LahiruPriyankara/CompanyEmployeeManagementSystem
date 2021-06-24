@@ -1,8 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/* 
+    Author     : lahiru priyankara
+*/
 package com.company.models;
 
 /**
@@ -32,7 +30,8 @@ public class UserData implements Cloneable {
     String DIV_CODE = "";//875 -Deprartment
     String DIV_NAME = "";
 
-    String base64Image = "";
+    String base64Image = "";    
+    String USER_ROLE = "";
 
 	public String getUSER_NAME() {
 		return USER_NAME;
@@ -138,14 +137,23 @@ public class UserData implements Cloneable {
 		this.base64Image = base64Image;
 	}
 
+	public String getUSER_ROLE() {
+		return USER_ROLE;
+	}
+
+	public void setUSER_ROLE(String uSER_ROLE) {
+		USER_ROLE = uSER_ROLE;
+	}
+
 	@Override
 	public String toString() {
 		return "UserData [USER_NAME=" + USER_NAME + ", USER_PASWD=" + USER_PASWD + ", USER_TYPE=" + USER_TYPE
 				+ ", USER_ID=" + USER_ID + ", FIRST_NAME=" + FIRST_NAME + ", LAST_NAME=" + LAST_NAME
 				+ ", SECURITY_CLASS=" + SECURITY_CLASS + ", AD_USER_ID=" + AD_USER_ID + ", OFFICER_STATUS="
 				+ OFFICER_STATUS + ", SOL_ID=" + SOL_ID + ", DIV_CODE=" + DIV_CODE + ", DIV_NAME=" + DIV_NAME
-				+ ", base64Image=" + base64Image + "]";
+				+ ", base64Image=" + base64Image + ", USER_ROLE=" + USER_ROLE + "]";
 	}
 
+	
     
 }

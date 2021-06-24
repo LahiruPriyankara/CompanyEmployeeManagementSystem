@@ -1,7 +1,5 @@
 <%-- 
-    Document   : include-body
-    Created on : Dec 21, 2020, 3:35:15 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -111,12 +109,12 @@
                             %>
                             <tr class="<%=model.getCompanyUserEmpId()%>">
                                 <td  style="background-color:#3399ff">
-                                    <%if (isAuthorizer) {%>
+                                    <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_AUTHORIZER)){ %>
                                     <input type="checkbox" class="depEmpDetailsCheckBox" onclick="clickOnCheckBox(this, '<%=model.getCompanyUserEmpId()%>', '<%=model.getRecStatus()%>', '')"/>
                                     <%}%>
                                 </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getPendingCompanyUserDetails('<%=model.getCompanyUserEmpId()%>','<%=model.getCompanyUserDivId() %>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -153,12 +151,12 @@
                             <%} else {%>
                             <tr class="<%=model.getCompanyUserEmpId()%>">
                                 <td  style="background-color: #e62e00">
-                                    <%if (isAuthorizer) {%>
-                                    <input type="checkbox" class="depEmpDetailsCheckBox" onclick="clickOnCheckBox(this, '<%=model.getCompanyUserEmpId()%>', '<%=model.getRecStatus()%>', '')"/>
+                                    <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_ENTERER)){ %>
+                					<input type="checkbox" class="depEmpDetailsCheckBox" onclick="clickOnCheckBox(this, '<%=model.getCompanyUserEmpId()%>', '<%=model.getRecStatus()%>', '')"/>
                                     <%}%>
                                 </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getPendingCompanyUserDetails('<%=model.getCompanyUserEmpId()%>','<%=model.getCompanyUserDivId() %>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -220,12 +218,12 @@
                             <%for (CompanyUserModel model : dvmUsersMisMatchWithUPMList) {%> 
                             <tr class="<%=model.getCompanyUserEmpId()%>">
                                 <td style="background-color: #e68a00">
-                                    <%if (isAuthorizer) {%>
+                                    <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_ENTERER)){ %>
                                     <input type="checkbox" class="depEmpDetailsCheckBox" onclick="clickOnCheckBox(this, '<%=model.getCompanyUserEmpId()%>', '<%=ApplicationConstants.RECORD_STATUS_REJECT%>', '0')"/>
                                     <%}%>
                                 </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getPendingCompanyUserDetails('<%=model.getCompanyUserEmpId()%>','<%=model.getCompanyUserDivId() %>', '<%=sURLPrefix%>/CompanyEmployee/PendingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -290,11 +288,16 @@
         </div>
         <div class="col-sm-12 col-md-8">
             <div style="float: right;"> 
-                <%if (isAuthorizer) {%><%}else{%><%}%>
+               <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_ENTERER)){ %>
                 <input id="deleteBtn" type="button" class="btn btn-danger" onclick="deleteCompanyUser('<%=sURLPrefix%>/CompanyEmployee/RemoveEmp')" value="Delete" style="width: 120px"/>
-                <input id="saveBtnn" type="button" class="btn btn-success" onclick="SaveEmp('<%=sURLPrefix%>/CompanyEmployee/SaveEmp')" value="Save" style="width: 120px"/>
+              	<input id="saveBtnn" type="button" class="btn btn-success" onclick="SaveEmp('<%=sURLPrefix%>/CompanyEmployee/SaveEmp')" value="Save" style="width: 120px"/>
+                <%} %>
+                
+                <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_AUTHORIZER)){ %>
                 <input id="rejectBtn" type="button" class="btn btn-warning" onclick="rejectCompanyUser('<%=sURLPrefix%>/CompanyEmployee/RejectEmp')" value="Reject" style="width: 120px"/>                
-                <input id="verifyBtn" type="button" class="btn btn-success" onclick="verifyCompanyUser('<%=sURLPrefix%>/CompanyEmployee/VerifyEmp')" value="Verify" style="width: 120px"/> 
+              	<input id="verifyBtn" type="button" class="btn btn-success" onclick="verifyCompanyUser('<%=sURLPrefix%>/CompanyEmployee/VerifyEmp')" value="Verify" style="width: 120px"/> 
+				 <%} %>              
+        
             </div>
         </div>
     </div>
@@ -502,6 +505,19 @@
             }
         }
 
+    }
+
+    function getPendingCompanyUserDetails(id,depId ,uri) {
+        console.log(uri);
+        if (uri !== "") {
+            hidePage();
+            $.post(uri, {id: id,depId:depId}, function (data) {
+                $('#modelDivData').empty();
+                $('#modelDivData').append(data);
+                showPage();
+            });
+            document.getElementById("btnForModel").click();
+        }        
     }
 
 </script>

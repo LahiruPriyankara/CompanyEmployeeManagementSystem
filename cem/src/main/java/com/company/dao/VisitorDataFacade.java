@@ -1,3 +1,5 @@
+
+
 package com.company.dao;
 
 import java.util.ArrayList;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import com.company.dbconfig.DbConfig;
 import com.company.dto.VisitorData;
-
+/* 
+Author     : lahiru priyankara
+*/
 @Repository
 public class VisitorDataFacade implements VisitorDataFacadeLocal{
 	Session session;

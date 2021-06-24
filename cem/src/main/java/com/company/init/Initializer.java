@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.company.init;
 
 import java.util.Arrays;
@@ -16,10 +12,9 @@ import org.apache.logging.log4j.Logger;
 import com.company.common.APPUtills;
 import com.company.common.ApplicationConstants;
 
-/**
- *
- * @author sits_lahirupr
- */
+/* 
+Author     : lahiru priyankara
+*/
 public class Initializer{
 
     private static Logger dedLog = LogManager.getLogger(Initializer.class);

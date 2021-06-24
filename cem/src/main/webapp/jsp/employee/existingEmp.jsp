@@ -1,8 +1,7 @@
 <%-- 
-    Document   : include-body
-    Created on : Dec 21, 2020, 3:35:15 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
+<%@page import="com.company.models.UserData"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <spring:url var="images" value="/resources/images"/>
@@ -37,6 +36,7 @@
     ObjectManager objManager1 = new ObjectManager(session);
     String sSession1 = session.getId();
     String sURLPrefix1 = request.getContextPath();
+    UserData userData1 = objManager1.get("userData") != null ? (UserData) objManager1.get("userData") : new UserData();
 
     Map<String, CompanyUserModel> ActiveUsers = objManager1.get("cemActiveUsers") != null ? (HashMap) objManager1.get("cemActiveUsers") : new HashMap();
     Map<String, CompanyUserModel> InactiveUsers = objManager1.get("cemInactiveUsers") != null ? (HashMap) objManager1.get("cemInactiveUsers") : new HashMap();
@@ -76,7 +76,7 @@
 </div>
 <br>
 
-<%if (true) {%>
+<%if(userData1.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData1.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)){ %>
 <div class="row">
     <div class="col-sm-6 col-md-6"><span style="color:#999999"><i><b>Results for : </b><%=criteria%></i></span></div>
     <div class="col-sm-2 col-md-2">        
@@ -162,9 +162,13 @@
                                     count++;
                             %> 
                             <tr>
-                                <td style="background-color: <%=rowBackGroundColor%>"><input type="checkbox" class="depEmpCheckBox" onclick="clickOnCheckBox(this, '<%=model.getCompanyUserEmpId()%>', '<%=model.getActionType()%>')" style=""/></td>
+                                <td style="background-color: <%=rowBackGroundColor%>">
+                                <%if(userData1.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData1.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_ENTERER)){ %>
+                                <input type="checkbox" class="depEmpCheckBox" onclick="clickOnCheckBox(this, '<%=model.getCompanyUserEmpId()%>', '<%=model.getActionType()%>')" style=""/>
+                                <%} %>
+                                </td>
                                 <td style="text-align: right">
-                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getExistingCompanyUserDetails('<%=model.getCompanyUserEmpId()%>', '<%=sURLPrefix1%>/CompanyEmployee/ExistingEmpDetails')"></span>
+                                    <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getExistingCompanyUserDetails('<%=model.getCompanyUserEmpId()%>','<%=model.getCompanyUserDivId() %>', '<%=sURLPrefix1%>/CompanyEmployee/ExistingEmpDetails')"></span>
                                 </td>
                                 <td>
                                     <%if (APPUtills.isThisStringValid(model.getBase64Image())) {%>
@@ -243,7 +247,9 @@
         </div>
         <div class="col-sm-2 col-md-2">
             <div style="float: right;">
+            <%if(userData1.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData1.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_BRANCH_ENTERER)){ %>
                 <button id="saveBtn" type="button" onclick="SaveBankEmp()" class="btn btn-success">Save</button> 
+            <%}%>
             </div>
         </div>
     </div>
@@ -295,18 +301,17 @@
         }
     }
 
-    function getExistingCompanyUserDetails(id, uri) {
+    function getExistingCompanyUserDetails(id,depId ,uri) {
         $("#saveBtn").show();
         if (uri !== "") {
             hidePage();
-            $.post(uri, {id: id}, function (data) {
+            $.post(uri, {id: id,depId:depId}, function (data) {
                 $('#modelDivData').empty();
                 $('#modelDivData').append(data);
                 showPage();
             });
+            document.getElementById("btnForModel").click();
         }
-
-        document.getElementById("btnForModel").click();
     }
 
     var map_add_new = new Map();

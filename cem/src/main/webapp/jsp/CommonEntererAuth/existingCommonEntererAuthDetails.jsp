@@ -1,7 +1,5 @@
 <%-- 
-    Document   : existingEmpDetails
-    Created on : Dec 22, 2020, 11:09:18 AM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@page import="com.company.models.CompanyUserModel"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>

@@ -1,3 +1,7 @@
+<%-- 
+    Author     : lahiru priyankara
+--%>
+
 <% if (request.getAttribute("rtnMsg") != null) {%>  
 <div class="alert alert-success alert-dismissible" id="alertMsg" style="margin-top: 30px">
     <p class="close">&times;</p>

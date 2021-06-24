@@ -1,3 +1,7 @@
+/* 
+    Author     : lahiru priyankara
+*/
+
 package com.company.appController;
 
 import java.io.BufferedReader;
@@ -58,13 +62,13 @@ public class CompanyEmployeeMngController {
 	public ModelAndView getSearchBankEmp(HttpServletRequest req, HttpServletResponse resp,HttpSession session){	
 		System.out.println("LEFT    | CompanyEmployeeCommonViewController.getSearchBankEmp()");
 		//UserData uData;
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> cemActiveUsers = new HashMap();//to hold CEM Active User AS KEY => employeeID: VALUE => UserData Object.
-        Map<String, CompanyUserModel> cemInactiveUsers = new HashMap();//to hold CEM Inactive User AS KEY => employeeID: VALUE => UserData Object.
-        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap();//to hold CEM Users who are not match with UPM.
-        Map<String, CompanyUserModel> cemNotAvailableUsers = new HashMap();//to hold Users who are not in CEM(They are only in UPM).
-        Map<String, DivInfo> divInfoMap = new HashMap();//to store sol infomation
+        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap<String, CompanyUserModel>();
+        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap<String, CompanyUserModel>();
+        Map<String, CompanyUserModel> cemActiveUsers = new HashMap<String, CompanyUserModel>();//to hold CEM Active User AS KEY => employeeID: VALUE => UserData Object.
+        Map<String, CompanyUserModel> cemInactiveUsers = new HashMap<String, CompanyUserModel>();//to hold CEM Inactive User AS KEY => employeeID: VALUE => UserData Object.
+        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap<String, CompanyUserModel>();//to hold CEM Users who are not match with UPM.
+        Map<String, CompanyUserModel> cemNotAvailableUsers = new HashMap<String, CompanyUserModel>();//to hold Users who are not in CEM(They are only in UPM).
+        Map<String, DivInfo> divInfoMap = new HashMap<String, DivInfo>();//to store sol infomation
         CompanyUserModel model = null;
         HashMap<String, UserData> userDataMap = new HashMap<>();
         List<UserData> userDataList = new ArrayList<>();
@@ -118,7 +122,7 @@ public class CompanyEmployeeMngController {
             }
 
             //Only For showing search criteria...............
-            String criteria = divInfoMap.get(depCode) != null ? ((DivInfo) divInfoMap.get(depCode)).getName() : "";
+            String criteria = divInfoMap.get(depCode) != null ? divInfoMap.get(depCode).getName() : "";
             criteria = "DEPARTMENT :" + criteria + "  |  EMPLOYEE ID :" + empId;
             System.out.println("MESSAGE | criteria : " + criteria);
             objManager.put("criteria", criteria, ApplicationConstants.SCOPE_COMPANY_USER);
@@ -158,7 +162,7 @@ public class CompanyEmployeeMngController {
                     Map<String, CompanyUserModel> bEMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(uData.getAD_USER_ID()), null);
                     List<CompanyUserModel> bEObjList = new ArrayList<>(bEMap.values());
                     if (bEObjList.size() > 0) {
-                    	CompanyUserModel dvmMsterModel = (CompanyUserModel) bEObjList.get(0);
+                    	CompanyUserModel dvmMsterModel = bEObjList.get(0);
                     	cemUsersMisMatchWithCOM_SERVICE.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
                     } else {
                         model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
@@ -253,17 +257,17 @@ public class CompanyEmployeeMngController {
 	private void getEmployeeListFromCem(ObjectManager objManager, String type, UserData userData) throws SBLException { // For Admin View | both existing and pending
         System.out.println("ENTERED | CompanyEmployeeMngController.getEmployeeListFromCem()");
         //UserData uData;
-        Map<String, HashMap> upmEmployeeMap = new HashMap();
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> cemActiveUsers = new HashMap();//to hold DVM Active User AS KEY => employeeID: VALUE => UserData Object.
-        Map<String, CompanyUserModel> cemInactiveUsers = new HashMap();//to hold DVM Inactive User AS KEY => employeeID: VALUE => UserData Object.
-        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are not match with UPM.
-        Map<String, CompanyUserModel> cemNotAvailableUsers = new HashMap();//to hold Users who are not in DVM(They are only in UPM).
-        Map<String, DivInfo> divInfoMap = new HashMap();//to store sol infomation
+        Map<String, HashMap> upmEmployeeMap = new HashMap<String, HashMap>();
+        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap<String, CompanyUserModel>();
+        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap<String, CompanyUserModel>();
+        Map<String, CompanyUserModel> cemActiveUsers = new HashMap<String, CompanyUserModel>();//to hold DVM Active User AS KEY => employeeID: VALUE => UserData Object.
+        Map<String, CompanyUserModel> cemInactiveUsers = new HashMap<String, CompanyUserModel>();//to hold DVM Inactive User AS KEY => employeeID: VALUE => UserData Object.
+        Map<String, CompanyUserModel> cemUsersMisMatchWithCOM_SERVICE = new HashMap<String, CompanyUserModel>();//to hold DVM Users who are not match with UPM.
+        Map<String, CompanyUserModel> cemNotAvailableUsers = new HashMap<String, CompanyUserModel>();//to hold Users who are not in DVM(They are only in UPM).
+        Map<String, DivInfo> divInfoMap = new HashMap<String, DivInfo>();//to store sol infomation
         CompanyUserModel model = null;
         String depCode = "";
-        Map<String, CompanyUserModel> cemUsersMatchWithCOM_SERVICE = new HashMap();//to hold DVM Users who are match with UPM.For Authorize view.
+        Map<String, CompanyUserModel> cemUsersMatchWithCOM_SERVICE = new HashMap<String, CompanyUserModel>();//to hold DVM Users who are match with UPM.For Authorize view.
         try {
             /* 
             --------------- MASTER DATA --------------
@@ -310,78 +314,85 @@ public class CompanyEmployeeMngController {
 
             //depCode = userData.getSOL_ID();
             depCode = userData.getDIV_CODE();
-            System.out.println("MESSAGE | SOL ID : " + depCode);
+            System.out.println("MESSAGE | DIV ID : " + depCode);
             if (!APPUtills.isThisStringValid(depCode)) {
                 System.out.println("ERROR | Empty DIV ID recieved.You do not have permission to view this page.");
                 throw new SBLException("You do not have permission to view this page.");
             }
 
+            HashMap<String, UserData> UPMEmployeesMap = companyUserLogic.getCOM_SERVICEEmployeesMap(depCode, null);
+            List<UserData> UPMEmployeesList = new ArrayList<>(UPMEmployeesMap.values());
+            System.out.println("MESSAGE | UPMEmployeesList.size() : " + UPMEmployeesList.size());
+            for (UserData uData : UPMEmployeesList) {
+
+                model = CompanyUserModel.userDataToModel(uData);
+                model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
+                COM_SERVICEEmployeesMap.put(uData.getAD_USER_ID(), model);
+                
+            }
+            objManager.put("COM_SERVICEEmployeesMap", COM_SERVICEEmployeesMap, ApplicationConstants.SCOPE_COMPANY_USER);
             if (type.equalsIgnoreCase(ApplicationConstants.MASTER_DATA)) {
                 System.out.println("MESSAGE | MASTER DATA..");
-                if (true) {//Only for common Admin
+                if (userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)) {//Only for common Admin
                     divInfoMap = companyUserLogic.getAllDepInfo();
                     objManager.put("divInfoMap", divInfoMap, ApplicationConstants.SCOPE_COMPANY_USER);
-                }
+                }else{
+                
+                	companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, null, depCode);
+                    for (UserData uData : UPMEmployeesList) {
+                        if (companyEmployeesMap.get(uData.getAD_USER_ID()) != null) {//That user is available in DVM
+                            //System.out.println("MESSAGE | That user is available in DVM");
+                            model = companyEmployeesMap.get(uData.getAD_USER_ID());
+                            model.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
 
-                //depCode = "861";
-                companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, null, depCode);
-                HashMap<String, UserData> UPMEmployeesMap = companyUserLogic.getCOM_SERVICEEmployeesMap(depCode, null);
-                List<UserData> UPMEmployeesList = new ArrayList<>(UPMEmployeesMap.values());
-                System.out.println("MESSAGE | UPMEmployeesList.size() : " + UPMEmployeesList.size());
-                for (UserData uData : UPMEmployeesList) {
-
-                    model = CompanyUserModel.userDataToModel(uData);
-                    model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
-                    COM_SERVICEEmployeesMap.put(uData.getAD_USER_ID(), model);
-
-                    if (companyEmployeesMap.get(uData.getAD_USER_ID()) != null) {//That user is available in DVM
-                        //System.out.println("MESSAGE | That user is available in DVM");
-                        model = companyEmployeesMap.get(uData.getAD_USER_ID());
-                        model.setActionType(ApplicationConstants.ACTION_TYPE_MODIFY);
-
-                        if (!model.getCompanyUserFirstName().equalsIgnoreCase(uData.getFIRST_NAME()) || !model.getCompanyUserLastName().equalsIgnoreCase(uData.getLAST_NAME()) || !model.getCompanyUserDepName().equalsIgnoreCase(uData.getDIV_NAME())) {
-                            cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), model);//cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), CompanyUserModel.userDataToModel(uData));
-                        } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_ACTIVE)) {
-                            cemActiveUsers.put(uData.getAD_USER_ID(), model);
-                        } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE)) {
-                            cemInactiveUsers.put(uData.getAD_USER_ID(), model);
-                        }
-                    } else {
-                        //System.out.println("MESSAGE | That user is not available in DVM");
-                        model = CompanyUserModel.userDataToModel(uData);
-
-                        Map<String, CompanyUserModel> bEMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(uData.getAD_USER_ID()), null);
-                        List<CompanyUserModel> bEObjList = new ArrayList<>(bEMap.values());
-                        if (bEObjList.size() > 0) {
-                            CompanyUserModel dvmMsterModel = (CompanyUserModel) bEObjList.get(0);
-                            cemUsersMisMatchWithCOM_SERVICE.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
-                            companyEmployeesMap.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
+                            if (!model.getCompanyUserFirstName().equalsIgnoreCase(uData.getFIRST_NAME()) || !model.getCompanyUserLastName().equalsIgnoreCase(uData.getLAST_NAME()) || !model.getCompanyUserDepName().equalsIgnoreCase(uData.getDIV_NAME())) {
+                                cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), model);//cemUsersMisMatchWithCOM_SERVICE.put(uData.getAD_USER_ID(), CompanyUserModel.userDataToModel(uData));
+                            } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_ACTIVE)) {
+                                cemActiveUsers.put(uData.getAD_USER_ID(), model);
+                            } else if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE)) {
+                                cemInactiveUsers.put(uData.getAD_USER_ID(), model);
+                            }
                         } else {
-                            model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
-                            cemNotAvailableUsers.put(uData.getAD_USER_ID(), model);
+                            //System.out.println("MESSAGE | That user is not available in DVM");
+                            model = CompanyUserModel.userDataToModel(uData);
+
+                            Map<String, CompanyUserModel> bEMap = companyUserLogic.getCompanyUsers(ApplicationConstants.MASTER_DATA, Arrays.asList(uData.getAD_USER_ID()), null);
+                            List<CompanyUserModel> bEObjList = new ArrayList<>(bEMap.values());
+                            if (bEObjList.size() > 0) {
+                                CompanyUserModel dvmMsterModel = bEObjList.get(0);
+                                cemUsersMisMatchWithCOM_SERVICE.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
+                                companyEmployeesMap.put(dvmMsterModel.getCompanyUserEmpId(), dvmMsterModel);
+                            } else {
+                                model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
+                                cemNotAvailableUsers.put(uData.getAD_USER_ID(), model);
+                            }
+
                         }
-
                     }
+                    
+                    objManager.put("cemActiveUsers", cemActiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+                    objManager.put("cemInactiveUsers", cemInactiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+                    objManager.put("cemNotAvailableUsers", cemNotAvailableUsers, ApplicationConstants.SCOPE_COMPANY_USER);
+
+                    System.out.println("MESSAGE | COM_SERVICEEmployeesMap.size() : " + COM_SERVICEEmployeesMap.size() + " cemActiveUsers.size() : " + cemActiveUsers.size() + " cemInactiveUsers.size() : " + cemInactiveUsers.size() + " cemNotAvailableUsers.size() : " + cemNotAvailableUsers.size());
+
                 }
-                objManager.put("COM_SERVICEEmployeesMap", COM_SERVICEEmployeesMap, ApplicationConstants.SCOPE_COMPANY_USER);
-                objManager.put("cemActiveUsers", cemActiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
-                objManager.put("cemInactiveUsers", cemInactiveUsers, ApplicationConstants.SCOPE_COMPANY_USER);
-                objManager.put("cemNotAvailableUsers", cemNotAvailableUsers, ApplicationConstants.SCOPE_COMPANY_USER);
-
-                System.out.println("MESSAGE | COM_SERVICEEmployeesMap.size() : " + COM_SERVICEEmployeesMap.size() + " cemActiveUsers.size() : " + cemActiveUsers.size() + " cemInactiveUsers.size() : " + cemInactiveUsers.size() + " cemNotAvailableUsers.size() : " + cemNotAvailableUsers.size());
-
             } else if (type.equalsIgnoreCase(ApplicationConstants.TEMP_DATA)) {
                 System.out.println("MESSAGE | TEMP DATA..");
-                //depCode = "861";// if common enter - depCode = ""
-                companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.TEMP_DATA, null, depCode);
+                if (userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)) {//Only for common Admin
+                	companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.TEMP_DATA, null, null);
+                }else{
+                	companyEmployeesMap = companyUserLogic.getCompanyUsers(ApplicationConstants.TEMP_DATA, null, depCode);
+                }
+                
                 List<CompanyUserModel> bankEmployeesList = new ArrayList<>(companyEmployeesMap.values());//DVM Temp Employee list
                 System.out.println("MESSAGE | bankEmployeesList.size() : " + bankEmployeesList.size());
                 for (CompanyUserModel bankUserModel : bankEmployeesList) {
                     if (upmEmployeeMap.get(bankUserModel.getCompanyUserDivId()) == null) {
                         upmEmployeeMap.put(bankUserModel.getCompanyUserDivId(),  companyUserLogic.getCOM_SERVICEEmployeesMap(bankUserModel.getCompanyUserDivId(), null));
                     }
-                    Map<String, UserData> UPMEmployeesMap = upmEmployeeMap.get(bankUserModel.getCompanyUserDivId());
-                    if (UPMEmployeesMap.get(bankUserModel.getCompanyUserEmpId()) != null) {
+                    
+                    if (upmEmployeeMap.get(bankUserModel.getCompanyUserDivId()).get(bankUserModel.getCompanyUserEmpId()) != null) {
                         cemUsersMatchWithCOM_SERVICE.put(bankUserModel.getCompanyUserEmpId(), bankUserModel);
                     } else {
                         cemUsersMisMatchWithCOM_SERVICE.put(bankUserModel.getCompanyUserEmpId(), bankUserModel);
@@ -436,7 +447,7 @@ public class CompanyEmployeeMngController {
                 throw new SBLException("Id is not recived.");
             }
             
-            getEmployeeDetails(objManager, ApplicationConstants.MASTER_DATA, req);
+            getEmployeeDetails(objManager, ApplicationConstants.MASTER_DATA,userData, req);
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
             req.setAttribute("errMsg", ex.getMessage());
@@ -467,7 +478,7 @@ public class CompanyEmployeeMngController {
         		return new ModelAndView("includes/include-dashboard");
         	}
         	
-        	getEmployeeDetails(objManager, ApplicationConstants.TEMP_DATA, req);
+        	getEmployeeDetails(objManager, ApplicationConstants.TEMP_DATA,userData, req);
         	
         } catch (SBLException ex) {
             System.out.println("ERROR   | " + ex.getMessage());
@@ -483,13 +494,14 @@ public class CompanyEmployeeMngController {
 		
 	}
 	
-	private void getEmployeeDetails(ObjectManager objManager, String type, HttpServletRequest req) throws SBLException {// For Admin View | both existing and pending Details
+	private void getEmployeeDetails(ObjectManager objManager, String type,UserData userData, HttpServletRequest req) throws SBLException {// For Admin View | both existing and pending Details
         System.out.println("ENTERED | CompanyEmployeeMngController.getEmployeeDetails()");
         CompanyUserModel CEMmodelMaster;
         CompanyUserModel CEMmodelTemp;
         CompanyUserModel COM_SERVICEmodel;
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
+        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap<String, CompanyUserModel>();
+        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap<String, CompanyUserModel>();
+        CompanyUserModel model;
         try {
             /*
             //------------ MASTER ------------ 
@@ -507,15 +519,31 @@ public class CompanyEmployeeMngController {
             objManager.remove("COM_SERVICEmodel");
 
             String empId = req.getParameter("id");
+            String depId = req.getParameter("depId");
+            
             System.out.println("MESSAGE | Employee ID : " + empId + ", Type : " + type);
             if (!APPUtills.isThisStringValid(empId)) {
                 System.out.println("ERROR   | Id is not recived.");
                 throw new SBLException("Id is not recived.");
+            }            
+            
+            if (userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER) || userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)) {//Only for common Admin
+            	HashMap<String, UserData> UPMEmployeesMap = companyUserLogic.getCOM_SERVICEEmployeesMap(depId, null);
+                List<UserData> UPMEmployeesList = new ArrayList<>(UPMEmployeesMap.values());
+                System.out.println("MESSAGE | UPMEmployeesList.size() : " + UPMEmployeesList.size());
+                for (UserData uData : UPMEmployeesList) {
+                    model = CompanyUserModel.userDataToModel(uData);
+                    model.setActionType(ApplicationConstants.ACTION_TYPE_NEW);
+                    COM_SERVICEEmployeesMap.put(uData.getAD_USER_ID(), model);
+                    
+                }
+            }else{
+            	 COM_SERVICEEmployeesMap = objManager.get("COM_SERVICEEmployeesMap") != null ? (HashMap) objManager.get("COM_SERVICEEmployeesMap") : new HashMap();
             }
+            
             if (type.equalsIgnoreCase(ApplicationConstants.MASTER_DATA)) {
                 companyEmployeesMap = objManager.get("companyEmployeesMap") != null ? (HashMap) objManager.get("companyEmployeesMap") : new HashMap();
-                COM_SERVICEEmployeesMap = objManager.get("COM_SERVICEEmployeesMap") != null ? (HashMap) objManager.get("COM_SERVICEEmployeesMap") : new HashMap();
-
+               
                 CEMmodelMaster = companyEmployeesMap.get(empId);
                 COM_SERVICEmodel = COM_SERVICEEmployeesMap.get(empId);
 
@@ -646,11 +674,11 @@ public class CompanyEmployeeMngController {
 	private void saveEmployeeDetails(ObjectManager objManager, UserData userData, boolean isBulk, MultipartHttpServletRequest req) throws SBLException {
        System.out.println("ENTERED | CompanyEmployeeCommonViewController.saveEmployeeDetails()");
         CompanyUserModel model;
-        List<CompanyUserModel> companyUserModels = new ArrayList();
+        List<CompanyUserModel> companyUserModels = new ArrayList<CompanyUserModel>();
         boolean isSuccess = false;
         String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
-        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap();
-        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap();
+        Map<String, CompanyUserModel> companyEmployeesMap = new HashMap<String, CompanyUserModel>();
+        Map<String, CompanyUserModel> COM_SERVICEEmployeesMap = new HashMap<String, CompanyUserModel>();
         List<String> IdsAryList = new ArrayList<>();
         try {
             /*
@@ -779,7 +807,7 @@ public class CompanyEmployeeMngController {
 	public ModelAndView rejectEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED | CompanyEmployeeMngController.rejectEmployeeDetails()");
         CompanyUserModel model;
-        List<CompanyUserModel> companyUserModels = new ArrayList();
+        List<CompanyUserModel> companyUserModels = new ArrayList<CompanyUserModel>();
         boolean isSuccess = false;
         String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
         ObjectManager objManager = null;
@@ -867,7 +895,7 @@ public class CompanyEmployeeMngController {
 	@RequestMapping(value = { "/CompanyEmployee/RemoveEmp"})
 	public ModelAndView removeEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED |  CompanyEmployeeMngController.removeEmployeeDetails()");
-        List<CompanyUserModel> companyUserModels = new ArrayList();
+        List<CompanyUserModel> companyUserModels = new ArrayList<CompanyUserModel>();
 
         boolean isSuccess = false;
         String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
@@ -940,7 +968,7 @@ public class CompanyEmployeeMngController {
 	public ModelAndView verifyEmployeeDetails(HttpServletRequest req, HttpServletResponse resp,HttpSession session){		
 		System.out.println("ENTERED | CompanyEmployeeMngController.verifyEmployeeDetails()");
         CompanyUserModel model;
-        List<CompanyUserModel> companyUserModels = new ArrayList();
+        List<CompanyUserModel> companyUserModels = new ArrayList<CompanyUserModel>();
         boolean isSuccess = false;
         String eventAction = "", eventDesc = "", tempObjectToString = "", masterObjectToString = "";
         ObjectManager objManager = null;

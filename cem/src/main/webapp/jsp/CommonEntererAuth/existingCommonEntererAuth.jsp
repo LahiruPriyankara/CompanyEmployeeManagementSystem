@@ -1,7 +1,5 @@
 <%-- 
-    Document   : include-body
-    Created on : Dec 21, 2020, 3:35:15 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@page import="com.company.models.CommonUserModel"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -125,6 +123,8 @@
                     </table> 
         </div>
     </div>
+    
+<%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER)){ %>
     <hr> 
     <div class="row">
         <div class="col-sm-8 col-md-8"></div>
@@ -142,7 +142,7 @@
         </div>
     </div>
 </form>
-
+<%} %>
 <hr>
 
 <div class="row">
@@ -167,7 +167,7 @@
                     	for(CommonUserModel obj: objList) {%>
                        <tr>
                             <td><%=obj.getCmnUserId() %></td>
-                            <td><%=obj.getCmnUserRole().equalsIgnoreCase("3")?" COMMON_ENTERER":"COMMON_AUTHORIZER " %></td>
+                            <td><%=ApplicationConstants.getRoleDesc(obj.getCmnUserRole()) %></td>
                             <td><%=ApplicationConstants.statusDesc(obj.getUserStatus())%></td>
                          </tr> 
                          <%}}%>

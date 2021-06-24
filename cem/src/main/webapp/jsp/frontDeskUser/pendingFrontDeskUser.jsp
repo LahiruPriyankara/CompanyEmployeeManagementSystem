@@ -1,7 +1,5 @@
 <%-- 
-    Document   : include-body
-    Created on : Dec 21, 2020, 3:35:15 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -61,11 +59,13 @@
                             <td style="text-align: right">
                                 <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUserDetails')"></span>
 
-                                <%if (!APPUtills.isThisStringValid(model.getRecStatus())) {%>
+                                <%if (!APPUtills.isThisStringValid(model.getRecStatus()) && userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER)) {%>
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUserForPasswordVerification('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/SaveNewFrontDeskUserPassword')"></span>
-                                <%} else if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING)) {%>
+                                <%} else if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_PENDING)) {
+                                if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)){ %>         
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyFdUserForPasswordVerification('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/VerifyFrontDeskUserPassword')"></span>
-                                <%}%>
+                                <%}
+                                }%>
 
                             </td>
                             <td><%=model.getFdUserTmpId()%></td>
@@ -82,8 +82,10 @@
                         <tr style="color: #ff704d">
                             <td style="text-align: right">
                                 <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUserDetails')"></span>
+                                <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER)){ %>         
                                 <span class="glyphicon glyphicon-trash removeIcon" style="color: #e62e00;" onclick="removeChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/RemoveFrontDeskUser')"></span>
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveFdUser('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix %>/FrontDeskUser/SaveReModifiedFrontDeskUser')"></span>
+                                <%}%>
                             </td>
                             <td><%=model.getFdUserTmpId()%></td>
                             <td><input type="text" class="fieldData" id="userName<%=model.getFdUserTmpId()%>" name="userName<%=model.getFdUserTmpId()%>" value="<%=APPUtills.getString(model.getFdUserName())%>" placeholder="USER NAME"></td>
@@ -98,12 +100,16 @@
                         <tr <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)) {%>style="color: #ff704d;background-color: #ffc2b3"<%}%>>
                             <td style="text-align: right">
                                 <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/PendingFrontDeskUserDetails')"></span>
-                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)) {%>
+                                <%if (model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)) {
+                                if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER)){ %>    
                                 <span class="glyphicon glyphicon-trash removeIcon" style="color: #e62e00;" onclick="removeChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/RemoveFrontDeskUser')"></span>
-                                <%} else {%>
+                                <%}
+                                } else {%>
+                                <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_AUTHORIZER)){ %>         
                                 <span class="glyphicon glyphicon-remove cancelIcon" style="color: #800000;" onclick="rejectChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/RejectFrontDeskUser')"></span>
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="verifyChanges('<%=model.getFdUserTmpId()%>', '<%=sURLPrefix%>/FrontDeskUser/VerifyFrontDeskUser')"></span>
-                                <%}%>
+                                <%}
+                                }%>
                             </td>
                             <td><%=model.getFdUserTmpId()%></td>
                             <td><%=APPUtills.getString(model.getFdUserName())%></td>

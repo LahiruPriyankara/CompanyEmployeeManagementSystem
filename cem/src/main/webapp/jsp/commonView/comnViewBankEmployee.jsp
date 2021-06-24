@@ -1,7 +1,5 @@
 <%-- 
-    Document   : allExistingEmp
-    Created on : Dec 24, 2020, 8:31:24 AM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>

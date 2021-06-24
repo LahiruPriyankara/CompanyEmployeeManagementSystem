@@ -1,7 +1,5 @@
 <%-- 
-    Document   : include-body
-    Created on : Dec 21, 2020, 3:35:15 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -65,7 +63,9 @@
                         <tr <%if (model.getUserStatus().equalsIgnoreCase(ApplicationConstants.STATUS_INACTIVE)) {%>style="color: #ff704d"<%}%> >
                             <td style="text-align: right">
                                 <span class="glyphicon glyphicon-list-alt detailsIcon" style="color: #3399ff;" onclick="getDetails('<%=model.getFdUserMasterId()%>', '<%=sURLPrefix%>/FrontDeskUser/ExistingFrontDeskUserDetails')"></span>
+                                <%if(userData.getUSER_ROLE().equalsIgnoreCase(ApplicationConstants.USER_ROLE_COMMON_ENTERER)){ %>         
                                 <span class="glyphicon glyphicon-ok successIcon" style="color: #009933;" onclick="saveModifiedFdUser('<%=model.getFdUserMasterId()%>', '<%=sURLPrefix%>/FrontDeskUser/SaveModifiedFdUser')"></span>
+                                <%}%>
                                 <span class="glyphicon glyphicon-refresh resetIcon" style="color: #600000;margin-right: 5px" onclick="resetPassword('<%=model.getFdUserMasterId()%>', '<%=ApplicationConstants.FD_USER%>')"></span>
                             </td>
                             <td><%=APPUtills.getString(model.getFdUserMasterId()+"")%></td>

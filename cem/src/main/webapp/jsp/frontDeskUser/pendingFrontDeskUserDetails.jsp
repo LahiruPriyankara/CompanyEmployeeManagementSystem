@@ -1,7 +1,5 @@
 <%-- 
-    Document   : pendingEmpDetails
-    Created on : Dec 22, 2020, 11:08:45 AM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -75,7 +73,7 @@
         </tr>
         <tr>                            
             <td><b>RECORD STATUS</b></td>
-            <td colspan="2" style="color: #004080"><%=ApplicationConstants.recordStatusDesc(model.getRecStatus())%></td>
+            <td colspan="2" style="color: #004080"><%=ApplicationConstants.recordStatusDesc(APPUtills.getString(model.getRecStatus()))%></td>
         </tr>
         <tr>                            
             <td><b>ACTION TAKEN BY</b></td>
@@ -95,7 +93,7 @@
         </tr>
         <tr style="background-color: #ffebe6">                            
             <td><b>REJECT REASON</b></td>
-            <td colspan="2" style="color: #004080"><%if(model.getRecStatus().equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)){%><b><i><%=model.getAuthComment() == null ? "" : model.getAuthComment()%></i></b><%}%></td>
+            <td colspan="2" style="color: #004080"><%if(APPUtills.getString(model.getRecStatus()).equalsIgnoreCase(ApplicationConstants.RECORD_STATUS_REJECT)){%><b><i><%=model.getAuthComment() == null ? "" : model.getAuthComment()%></i></b><%}%></td>
         </tr>
     </tbody>
 </table>

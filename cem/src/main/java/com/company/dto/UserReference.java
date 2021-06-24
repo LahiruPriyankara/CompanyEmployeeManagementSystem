@@ -21,10 +21,9 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author sits_lahirupr
- */
+/* 
+Author     : lahiru priyankara
+*/
 @Entity
 @Table(name = "CUD_USER_REFERENCE_TBL")
 public class UserReference implements Serializable {

@@ -1,7 +1,5 @@
 <%-- 
-    Document   : home
-    Created on : Dec 18, 2020, 1:22:42 PM
-    Author     : sits_lahirupr
+    Author     : lahiru priyankara
 --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -50,9 +48,9 @@
                             <span class="glyphicon glyphicon-user"></span>                             
                             User : <%=userData.getFIRST_NAME() + " " + userData.getLAST_NAME()%> | 
                             <%if (userData.getUSER_TYPE().equalsIgnoreCase(ApplicationConstants.BANK_EMPLOYEE)) {%>
-                            &nbsp;&nbsp;Emp ID : <%=userData.getUSER_ID()%> - <%=userData.getAD_USER_ID()%> |  DEPARTMENT ID : <%=userData.getDIV_CODE()%> |
+                            &nbsp;&nbsp;Emp ID : <%=userData.getUSER_ID()%> - <%=userData.getAD_USER_ID()%> |  DEPARTMENT ID : <%=userData.getDIV_CODE()%> | ROLE : <%=ApplicationConstants.getRoleDesc(userData.getUSER_ROLE())%> |
                             <%} else {%>
-                            &nbsp;&nbsp;Emp ID : <%=userData.getUSER_NAME()%> |
+                            &nbsp;&nbsp;Emp ID : <%=userData.getUSER_NAME()%> | ROLE : <%=ApplicationConstants.getRoleDesc(userData.getUSER_ROLE())%> |
                             <%}%>
                             &nbsp;&nbsp;Date : <span id="dateLabel"></span>                          
                         </span>
@@ -85,4 +83,4 @@
     showPage();
     var date = new Date();
     document.getElementById("dateLabel").innerHTML = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
-</script>
+</script> 
